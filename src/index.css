@@ -1,0 +1,531 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Good Doc 2025 Hospital-Grade Design System
+   All colors MUST be HSL for consistency.
+   Tokens prefixed with --gd- for namespacing.
+*/
+
+@layer base {
+  :root {
+    /* ═══════════════════════════════════════════════════════════════
+       GOOD DOC DESIGN TOKENS - LIGHT THEME
+       ═══════════════════════════════════════════════════════════════ */
+    
+    /* Primary (Care Blue) - trustworthy, primary actions */
+    --gd-primary-50: 214 100% 97%;
+    --gd-primary-100: 214 100% 93%;
+    --gd-primary-200: 214 100% 86%;
+    --gd-primary-300: 214 100% 77%;
+    --gd-primary-400: 214 100% 66%;
+    --gd-primary-500: 218 100% 59%;
+    --gd-primary-600: 218 80% 50%;
+    --gd-primary-700: 218 77% 40%;
+    --gd-primary-800: 218 77% 32%;
+    --gd-primary-900: 218 78% 23%;
+    
+    /* Secondary/Accent (Healing Teal) - supportive accent */
+    --gd-accent-50: 170 100% 94%;
+    --gd-accent-100: 170 100% 89%;
+    --gd-accent-200: 170 100% 78%;
+    --gd-accent-300: 170 100% 67%;
+    --gd-accent-400: 170 100% 56%;
+    --gd-accent-500: 174 100% 42%;
+    --gd-accent-600: 174 100% 36%;
+    --gd-accent-700: 174 100% 29%;
+    --gd-accent-800: 174 100% 23%;
+    --gd-accent-900: 174 100% 15%;
+    
+    /* Neutral (Clinical Slate) */
+    --gd-neutral-0: 0 0% 100%;
+    --gd-neutral-50: 216 33% 97%;
+    --gd-neutral-100: 216 25% 95%;
+    --gd-neutral-200: 216 20% 91%;
+    --gd-neutral-300: 215 20% 83%;
+    --gd-neutral-400: 215 16% 65%;
+    --gd-neutral-500: 215 16% 47%;
+    --gd-neutral-600: 215 19% 35%;
+    --gd-neutral-700: 215 25% 27%;
+    --gd-neutral-800: 217 33% 17%;
+    --gd-neutral-900: 222 47% 11%;
+    
+    /* Functional Colors */
+    --gd-success: 160 84% 39%;
+    --gd-success-light: 152 76% 95%;
+    --gd-success-dark: 160 84% 30%;
+    --gd-warning: 38 92% 50%;
+    --gd-warning-light: 48 96% 95%;
+    --gd-warning-dark: 32 95% 35%;
+    --gd-error: 0 72% 51%;
+    --gd-error-light: 0 86% 97%;
+    --gd-error-dark: 0 72% 42%;
+    --gd-info: 201 96% 39%;
+    --gd-info-light: 201 100% 96%;
+    --gd-info-dark: 201 96% 30%;
+
+    /* ═══════════════════════════════════════════════════════════════
+       SEMANTIC TOKENS - LIGHT THEME
+       ═══════════════════════════════════════════════════════════════ */
+    
+    /* Backgrounds */
+    --background: var(--gd-neutral-50);
+    --foreground: var(--gd-neutral-900);
+    
+    /* Cards & Surfaces */
+    --card: var(--gd-neutral-0);
+    --card-foreground: var(--gd-neutral-900);
+    
+    /* Popovers */
+    --popover: var(--gd-neutral-0);
+    --popover-foreground: var(--gd-neutral-900);
+    
+    /* Primary */
+    --primary: var(--gd-primary-600);
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary */
+    --secondary: var(--gd-neutral-100);
+    --secondary-foreground: var(--gd-neutral-900);
+    
+    /* Muted */
+    --muted: var(--gd-neutral-100);
+    --muted-foreground: var(--gd-neutral-500);
+    
+    /* Accent */
+    --accent: var(--gd-accent-600);
+    --accent-foreground: 0 0% 100%;
+    
+    /* Destructive */
+    --destructive: var(--gd-error);
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Borders & Inputs */
+    --border: var(--gd-neutral-200);
+    --input: var(--gd-neutral-200);
+    --ring: var(--gd-primary-400);
+    
+    /* Focus */
+    --focus: var(--gd-primary-400);
+    
+    /* Tab Active */
+    --tab-active: var(--gd-primary-600);
+    
+    /* Ask Good Doc Feature Colors */
+    --ask-good-doc-orange: 22 75% 51%;
+    --ask-good-doc-red: 2 77% 54%;
+    --ask-good-doc-gradient: linear-gradient(135deg, hsl(22 75% 51%), hsl(2 77% 54%));
+    
+    /* Radius */
+    --radius: 0.75rem;
+    --radius-xs: 0.375rem;
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+    --radius-pill: 9999px;
+    
+    /* Shadows */
+    --shadow-s: 0 1px 2px hsla(220, 43%, 11%, 0.06);
+    --shadow-m: 0 2px 8px hsla(220, 43%, 11%, 0.08);
+    --shadow-l: 0 8px 24px hsla(220, 43%, 11%, 0.12);
+    
+    /* Motion */
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --ease-decel: cubic-bezier(0, 0, 0.2, 1);
+    --ease-accel: cubic-bezier(0.3, 0, 1, 1);
+    --duration-fast: 120ms;
+    --duration-base: 180ms;
+    --duration-slow: 240ms;
+    --duration-long: 320ms;
+    
+    /* Sidebar - Dark themed sidebar */
+    --sidebar-background: var(--gd-neutral-900);
+    --sidebar-foreground: var(--gd-neutral-300);
+    --sidebar-primary: var(--gd-primary-500);
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: var(--gd-neutral-800);
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: var(--gd-neutral-800);
+    --sidebar-ring: var(--gd-primary-400);
+    
+    /* Status Colors for Badges/Alerts */
+    --status-success-bg: var(--gd-success-light);
+    --status-success-text: 158 64% 20%;
+    --status-warning-bg: var(--gd-warning-light);
+    --status-warning-text: 32 90% 20%;
+    --status-error-bg: var(--gd-error-light);
+    --status-error-text: 0 70% 25%;
+    --status-info-bg: var(--gd-info-light);
+    --status-info-text: 201 90% 20%;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     DARK THEME
+     ═══════════════════════════════════════════════════════════════ */
+  .dark {
+    /* Backgrounds */
+    --background: var(--gd-neutral-900);
+    --foreground: 220 13% 91%;
+    
+    /* Cards & Surfaces */
+    --card: var(--gd-neutral-800);
+    --card-foreground: 220 13% 91%;
+    
+    /* Popovers */
+    --popover: var(--gd-neutral-800);
+    --popover-foreground: 220 13% 91%;
+    
+    /* Primary */
+    --primary: var(--gd-primary-500);
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary */
+    --secondary: var(--gd-neutral-800);
+    --secondary-foreground: 220 13% 91%;
+    
+    /* Muted */
+    --muted: var(--gd-neutral-800);
+    --muted-foreground: var(--gd-neutral-400);
+    
+    /* Accent */
+    --accent: var(--gd-accent-500);
+    --accent-foreground: 170 80% 10%;
+    
+    /* Destructive */
+    --destructive: 0 62% 70%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Borders & Inputs */
+    --border: var(--gd-neutral-700);
+    --input: var(--gd-neutral-700);
+    --ring: var(--gd-primary-300);
+    
+    /* Focus */
+    --focus: var(--gd-primary-300);
+    
+    /* Tab Active */
+    --tab-active: var(--gd-primary-500);
+    
+    /* Shadows for dark mode */
+    --shadow-s: 0 1px 2px hsla(0, 0%, 0%, 0.3);
+    --shadow-m: 0 2px 8px hsla(0, 0%, 0%, 0.4);
+    --shadow-l: 0 8px 24px hsla(0, 0%, 0%, 0.5);
+    
+    /* Sidebar */
+    --sidebar-background: 222 47% 8%;
+    --sidebar-foreground: var(--gd-neutral-300);
+    --sidebar-primary: var(--gd-primary-400);
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: var(--gd-neutral-700);
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: var(--gd-neutral-700);
+    --sidebar-ring: var(--gd-primary-300);
+    
+    /* Status Colors for Dark Mode */
+    --status-success-bg: 158 60% 15%;
+    --status-success-text: 158 70% 75%;
+    --status-warning-bg: 38 60% 15%;
+    --status-warning-text: 38 90% 75%;
+    --status-error-bg: 0 50% 15%;
+    --status-error-text: 0 70% 75%;
+    --status-info-bg: 201 60% 15%;
+    --status-info-text: 201 90% 75%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased text-sm;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  
+  /* Typography base styles */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+  
+  /* Focus visible for accessibility */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+  
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Smooth tab navigation animation */
+  .tab-trigger {
+    @apply transition-all duration-base ease-standard;
+    position: relative;
+  }
+  
+  .tab-trigger::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: hsl(var(--tab-active));
+    transform: scaleX(0);
+    transition: transform var(--duration-base) var(--ease-standard);
+  }
+  
+  .tab-trigger[data-state="active"]::after {
+    transform: scaleX(1);
+  }
+  
+  /* Card hover effect */
+  .card-interactive {
+    @apply transition-shadow duration-base ease-standard;
+  }
+  
+  .card-interactive:hover {
+    box-shadow: var(--shadow-m);
+  }
+  
+  /* Button states */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground;
+    @apply hover:brightness-110 active:brightness-95;
+    @apply disabled:opacity-40 disabled:pointer-events-none;
+    @apply transition-all duration-fast ease-standard;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground;
+    @apply hover:bg-muted active:bg-muted/80;
+    @apply disabled:opacity-40 disabled:pointer-events-none;
+    @apply transition-all duration-fast ease-standard;
+  }
+  
+  /* Focus ring utility */
+  .focus-ring {
+    @apply focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+  }
+  
+  /* Touch-friendly target size */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Skeleton loading animation */
+  .skeleton {
+    @apply bg-muted rounded-md animate-pulse;
+  }
+  
+  /* Divider styles */
+  .divider {
+    @apply border-border/70;
+  }
+  
+  /* Status badges */
+  .badge-success {
+    background-color: hsl(var(--status-success-bg));
+    color: hsl(var(--status-success-text));
+  }
+  
+  .badge-warning {
+    background-color: hsl(var(--status-warning-bg));
+    color: hsl(var(--status-warning-text));
+  }
+  
+  .badge-error {
+    background-color: hsl(var(--status-error-bg));
+    color: hsl(var(--status-error-text));
+  }
+  
+  .badge-info {
+    background-color: hsl(var(--status-info-bg));
+    color: hsl(var(--status-info-text));
+  }
+}
+
+/* Animation keyframes */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BILLING TYPOGRAPHY SYSTEM
+   Unified typography for payment/billing screens
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Enable tabular numerals for all billing amounts */
+.billing-nums {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Type Scale - Page Title: 24/32 700 */
+.billing-page-title {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Type Scale - Section Title: 16/24 600 */
+.billing-section-title {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+/* Type Scale - Label: 12/16 500 */
+.billing-label {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+  color: hsl(var(--muted-foreground));
+}
+
+/* Type Scale - Body: 14/22 400 */
+.billing-body {
+  font-size: 0.875rem;
+  line-height: 1.375rem;
+  font-weight: 400;
+  color: hsl(var(--foreground));
+}
+
+/* Type Scale - Helper: 12/18 400 */
+.billing-helper {
+  font-size: 0.75rem;
+  line-height: 1.125rem;
+  font-weight: 400;
+  color: hsl(var(--muted-foreground));
+}
+
+/* Type Scale - Value: 14/22 400 */
+.billing-value {
+  font-size: 0.875rem;
+  line-height: 1.375rem;
+  font-weight: 400;
+  color: hsl(var(--foreground));
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Type Scale - Amount Primary (key totals): 18/26 700 */
+.billing-amount-primary {
+  font-size: 1.125rem;
+  line-height: 1.625rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Type Scale - Amount Negative: 14/22 600 danger */
+.billing-amount-negative {
+  font-size: 0.875rem;
+  line-height: 1.375rem;
+  font-weight: 600;
+  color: hsl(var(--gd-error));
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Type Scale - Amount Muted (zero/placeholder): 14/22 600 muted */
+.billing-amount-muted {
+  font-size: 0.875rem;
+  line-height: 1.375rem;
+  font-weight: 600;
+  color: hsl(var(--muted-foreground));
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Type Scale - Amount Success: 14/22 600 success */
+.billing-amount-success {
+  font-size: 0.875rem;
+  line-height: 1.375rem;
+  font-weight: 600;
+  color: hsl(var(--gd-success));
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Type Scale - Link: 14/20 600 primary */
+.billing-link {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  color: hsl(var(--primary));
+  cursor: pointer;
+}
+.billing-link:hover,
+.billing-link:focus {
+  text-decoration: underline;
+}
+
+/* Type Scale - Control Label (checkbox/radio): 14/20 500 */
+.billing-control-label {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+}
+
+/* Type Scale - Caption Disclaimer: 12/18 400 secondary */
+.billing-caption {
+  font-size: 0.75rem;
+  line-height: 1.125rem;
+  font-weight: 400;
+  color: hsl(var(--muted-foreground));
+}

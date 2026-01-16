@@ -1,0 +1,2420 @@
+<!DOCTYPE html>
+<html lang="en" data-page-size="a4" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discharge Summary – Patient Record</title>
+  <meta name="description" content="Hospital Discharge Summary Document">
+  
+  <!-- Print-safe fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ==========================================================================
+       CSS Custom Properties (Branding Tokens)
+       ========================================================================== */
+    :root {
+      --accent: #1D3557;
+      --accent-light: #457B9D;
+      --text: #111111;
+      --text-secondary: #4A5568;
+      --muted: #666666;
+      --border: #D9DEE6;
+      --border-light: #E8ECF1;
+      --bg: #FFFFFF;
+      --bg-subtle: #F8FAFC;
+      --success: #059669;
+      --warning: #D97706;
+      --danger: #DC2626;
+      --info: #0284C7;
+      
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --font-size-xs: 9pt;
+      --font-size-sm: 10pt;
+      --font-size-base: 11pt;
+      --font-size-lg: 12pt;
+      --font-size-xl: 13pt;
+      --font-size-2xl: 14pt;
+      --font-size-3xl: 16pt;
+      
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 12px;
+      --spacing-lg: 16px;
+      --spacing-xl: 24px;
+      --spacing-2xl: 32px;
+      
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+      
+      --content-width: 900px;
+      --print-header-height: 60px;
+      --print-footer-height: 40px;
+    }
+    
+    /* High Contrast Theme */
+    [data-theme="high-contrast"] {
+      --text: #000000;
+      --text-secondary: #1a1a1a;
+      --muted: #333333;
+      --border: #000000;
+      --bg-subtle: #f0f0f0;
+    }
+
+    /* ==========================================================================
+       Base Styles
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    
+    html {
+      font-size: var(--font-size-base);
+      line-height: 1.5;
+      -webkit-text-size-adjust: 100%;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-body);
+      color: var(--text);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* ==========================================================================
+       Toolbar (Screen Only)
+       ========================================================================== */
+    .toolbar {
+      position: sticky;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      padding: var(--spacing-md) var(--spacing-xl);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--spacing-lg);
+    }
+    
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+    
+    .toolbar-logo {
+      height: 36px;
+      width: auto;
+    }
+    
+    .toolbar-title {
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+      color: var(--accent);
+    }
+    
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      padding: var(--spacing-sm) var(--spacing-md);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      font-family: inherit;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    
+    .btn:hover {
+      background: var(--bg-subtle);
+      border-color: var(--accent-light);
+    }
+    
+    .btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+    
+    .btn-primary:hover {
+      background: #162a47;
+    }
+    
+    .btn-icon {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      justify-content: center;
+    }
+    
+    .btn svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+    
+    .toolbar-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--border);
+      margin: 0 var(--spacing-xs);
+    }
+    
+    .page-size-select {
+      padding: var(--spacing-sm) var(--spacing-md);
+      font-size: var(--font-size-sm);
+      font-family: inherit;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--bg);
+      cursor: pointer;
+    }
+    
+    .kbd {
+      display: inline-block;
+      padding: 2px 6px;
+      font-size: 9px;
+      font-family: inherit;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      margin-left: 4px;
+    }
+
+    /* ==========================================================================
+       Main Content Container
+       ========================================================================== */
+    .document-container {
+      max-width: var(--content-width);
+      margin: 0 auto;
+      padding: var(--spacing-xl);
+      background: var(--bg);
+    }
+
+    /* ==========================================================================
+       Print Header & Footer (Fixed for print)
+       ========================================================================== */
+    .print-header,
+    .print-footer {
+      display: none;
+    }
+
+    /* ==========================================================================
+       Document Header Card
+       ========================================================================== */
+    .header-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: var(--spacing-xl);
+    }
+    
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-lg) var(--spacing-xl);
+      background: var(--accent);
+      color: white;
+    }
+    
+    .hospital-info {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+    
+    .hospital-logo-print {
+      height: 40px;
+      width: auto;
+    }
+    
+    .hospital-name {
+      font-size: var(--font-size-xl);
+      font-weight: 600;
+    }
+    
+    .hospital-tagline {
+      font-size: var(--font-size-xs);
+      opacity: 0.85;
+    }
+    
+    .document-status {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 12px;
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .status-badge.draft {
+      background: var(--warning);
+    }
+    
+    .status-badge.final {
+      background: var(--success);
+    }
+    
+    .document-title {
+      font-size: var(--font-size-2xl);
+      font-weight: 600;
+    }
+    
+    .header-body {
+      padding: var(--spacing-xl);
+    }
+    
+    .header-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-xl);
+    }
+    
+    @media (max-width: 768px) {
+      .header-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .info-section {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+    }
+    
+    .info-section-title {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: var(--spacing-xs);
+      padding-bottom: var(--spacing-xs);
+      border-bottom: 2px solid var(--accent);
+    }
+    
+    .info-row {
+      display: flex;
+      gap: var(--spacing-lg);
+      flex-wrap: wrap;
+    }
+    
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      min-width: 120px;
+    }
+    
+    .info-label {
+      font-size: var(--font-size-xs);
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+    
+    .info-value {
+      font-size: var(--font-size-base);
+      font-weight: 500;
+      color: var(--text);
+    }
+    
+    .info-value.empty {
+      color: var(--muted);
+      font-style: italic;
+      font-weight: 400;
+    }
+    
+    /* Patient Avatar & QR */
+    .patient-identity {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+    }
+    
+    .patient-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-lg);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 24px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    
+    .patient-name-block {
+      flex: 1;
+    }
+    
+    .patient-name {
+      font-size: var(--font-size-2xl);
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    
+    .patient-mrn {
+      font-size: var(--font-size-sm);
+      color: var(--muted);
+      font-family: monospace;
+    }
+    
+    .qr-code {
+      width: 72px;
+      height: 72px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 4px;
+      flex-shrink: 0;
+    }
+    
+    .qr-code svg {
+      width: 100%;
+      height: 100%;
+    }
+    
+    /* Chips / Pills */
+    .chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-sm);
+      margin-top: var(--spacing-md);
+    }
+    
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      font-size: var(--font-size-xs);
+      font-weight: 500;
+      border-radius: 999px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+    }
+    
+    .chip.allergy {
+      background: #FEF2F2;
+      border-color: #FECACA;
+      color: #991B1B;
+    }
+    
+    .chip.diagnosis {
+      background: #EFF6FF;
+      border-color: #BFDBFE;
+      color: #1E40AF;
+    }
+    
+    .chip.procedure {
+      background: #F0FDF4;
+      border-color: #BBF7D0;
+      color: #166534;
+    }
+    
+    .chip.disposition {
+      background: #FDF4FF;
+      border-color: #F5D0FE;
+      color: #86198F;
+    }
+    
+    .chip.followup {
+      background: #FFFBEB;
+      border-color: #FDE68A;
+      color: #92400E;
+    }
+    
+    .chip-icon {
+      width: 12px;
+      height: 12px;
+    }
+    
+    /* At a Glance Row */
+    .glance-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-md) var(--spacing-xl);
+      background: var(--bg-subtle);
+      border-top: 1px solid var(--border-light);
+    }
+    
+    .glance-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: var(--font-size-sm);
+    }
+    
+    .glance-label {
+      color: var(--muted);
+    }
+    
+    .glance-value {
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .glance-divider {
+      color: var(--border);
+      margin: 0 var(--spacing-xs);
+    }
+
+    /* ==========================================================================
+       Sections
+       ========================================================================== */
+    .section {
+      margin-bottom: var(--spacing-xl);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-md) var(--spacing-lg);
+      background: var(--bg-subtle);
+      border-bottom: 1px solid var(--border-light);
+      cursor: pointer;
+      user-select: none;
+    }
+    
+    .section-header:hover {
+      background: #f1f5f9;
+    }
+    
+    .section-header:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+    
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+      color: var(--accent);
+      margin: 0;
+    }
+    
+    .section-title-icon {
+      width: 20px;
+      height: 20px;
+      color: var(--accent-light);
+    }
+    
+    .section-toggle {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      transition: transform 0.2s ease;
+    }
+    
+    .section.collapsed .section-toggle {
+      transform: rotate(-90deg);
+    }
+    
+    .section-content {
+      padding: var(--spacing-lg);
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+    
+    .section.collapsed .section-content {
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    
+    .section-anchor {
+      position: relative;
+      top: -80px;
+      visibility: hidden;
+    }
+
+    /* ==========================================================================
+       Tables
+       ========================================================================== */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--font-size-sm);
+    }
+    
+    .data-table thead {
+      display: table-header-group;
+    }
+    
+    .data-table tfoot {
+      display: table-footer-group;
+    }
+    
+    .data-table th {
+      text-align: left;
+      padding: var(--spacing-sm) var(--spacing-md);
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--bg-subtle);
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+    
+    .data-table td {
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: top;
+    }
+    
+    .data-table tbody tr:nth-child(even) {
+      background: var(--bg-subtle);
+    }
+    
+    .data-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .data-table .text-center {
+      text-align: center;
+    }
+    
+    .data-table .text-right {
+      text-align: right;
+    }
+    
+    .data-table .nowrap {
+      white-space: nowrap;
+    }
+    
+    .table-note {
+      font-size: var(--font-size-xs);
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    
+    .med-new {
+      display: inline-block;
+      padding: 1px 6px;
+      font-size: 8px;
+      font-weight: 600;
+      background: var(--success);
+      color: white;
+      border-radius: 3px;
+      text-transform: uppercase;
+      margin-left: 4px;
+    }
+    
+    .med-continued {
+      display: inline-block;
+      padding: 1px 6px;
+      font-size: 8px;
+      font-weight: 600;
+      background: var(--info);
+      color: white;
+      border-radius: 3px;
+      text-transform: uppercase;
+      margin-left: 4px;
+    }
+    
+    .result-normal {
+      color: var(--success);
+    }
+    
+    .result-abnormal {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    /* ==========================================================================
+       Content Elements
+       ========================================================================== */
+    .bullet-list {
+      margin: 0;
+      padding-left: var(--spacing-xl);
+    }
+    
+    .bullet-list li {
+      margin-bottom: var(--spacing-sm);
+      line-height: 1.5;
+    }
+    
+    .bullet-list li:last-child {
+      margin-bottom: 0;
+    }
+    
+    .narrative {
+      line-height: 1.6;
+      color: var(--text);
+    }
+    
+    .narrative p {
+      margin: 0 0 var(--spacing-md) 0;
+    }
+    
+    .narrative p:last-child {
+      margin-bottom: 0;
+    }
+    
+    .diagnosis-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .diagnosis-item {
+      padding: var(--spacing-sm) 0;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--spacing-md);
+    }
+    
+    .diagnosis-item:last-child {
+      border-bottom: none;
+    }
+    
+    .diagnosis-type {
+      flex-shrink: 0;
+      padding: 2px 8px;
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+    }
+    
+    .diagnosis-type.primary {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .diagnosis-type.secondary {
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    
+    .diagnosis-text {
+      flex: 1;
+    }
+    
+    .diagnosis-code {
+      font-size: var(--font-size-xs);
+      color: var(--muted);
+      font-family: monospace;
+    }
+    
+    .instruction-block {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-md);
+      margin-bottom: var(--spacing-md);
+    }
+    
+    .instruction-block:last-child {
+      margin-bottom: 0;
+    }
+    
+    .instruction-title {
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: var(--spacing-xs);
+    }
+    
+    .red-flag-list {
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      border-radius: var(--radius-md);
+      padding: var(--spacing-md) var(--spacing-lg);
+    }
+    
+    .red-flag-list li {
+      color: #991B1B;
+    }
+    
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-md);
+    }
+    
+    .contact-card {
+      padding: var(--spacing-md);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+    }
+    
+    .contact-title {
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: var(--spacing-xs);
+    }
+    
+    .contact-value {
+      font-size: var(--font-size-sm);
+      color: var(--text);
+    }
+    
+    .contact-value a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    
+    .contact-value a:hover {
+      text-decoration: underline;
+    }
+
+    /* ==========================================================================
+       Signatures Section
+       ========================================================================== */
+    .signatures-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-2xl);
+      margin-top: var(--spacing-lg);
+    }
+    
+    @media (max-width: 600px) {
+      .signatures-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .signature-block {
+      text-align: center;
+    }
+    
+    .signature-line {
+      border-bottom: 1px solid var(--text);
+      height: 40px;
+      margin-bottom: var(--spacing-sm);
+    }
+    
+    .signature-label {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+    }
+    
+    .signature-details {
+      font-size: var(--font-size-xs);
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ==========================================================================
+       Footer
+       ========================================================================== */
+    .document-footer {
+      margin-top: var(--spacing-2xl);
+      padding-top: var(--spacing-lg);
+      border-top: 1px solid var(--border);
+      font-size: var(--font-size-xs);
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.6;
+    }
+    
+    .legal-notice {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-md);
+      margin-bottom: var(--spacing-md);
+      font-size: var(--font-size-xs);
+      color: var(--muted);
+      text-align: left;
+    }
+    
+    .legal-notice strong {
+      color: var(--text);
+    }
+
+    /* ==========================================================================
+       Watermark
+       ========================================================================== */
+    .watermark {
+      display: none;
+    }
+    
+    [data-watermark="true"] .watermark {
+      display: block;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      font-size: 72px;
+      font-weight: 700;
+      color: rgba(0, 0, 0, 0.04);
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 0;
+      letter-spacing: 8px;
+    }
+
+    /* ==========================================================================
+       Print Styles
+       ========================================================================== */
+    @media print {
+      /* Page setup - A4 default */
+      @page {
+        size: A4 portrait;
+        margin: 12mm;
+      }
+      
+      /* US Letter variant */
+      [data-page-size="letter"] {
+        @page {
+          size: letter portrait;
+          margin: 0.5in;
+        }
+      }
+      
+      /* Hide screen-only elements */
+      .no-print,
+      .toolbar,
+      .section-toggle,
+      .btn {
+        display: none !important;
+      }
+      
+      /* Reset body */
+      body {
+        background: white;
+        color: #000;
+        font-size: 11pt;
+        line-height: 1.4;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      
+      /* Container adjustments */
+      .document-container {
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+        padding-top: var(--print-header-height);
+        padding-bottom: var(--print-footer-height);
+      }
+      
+      /* Print header - fixed */
+      .print-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--print-header-height);
+        padding: 8px 12mm;
+        background: white;
+        border-bottom: 1px solid #ccc;
+        font-size: 9pt;
+        z-index: 1000;
+      }
+      
+      .print-header-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .print-header-logo {
+        height: 28px;
+        filter: grayscale(100%);
+      }
+      
+      .print-header-text {
+        font-weight: 600;
+        color: #333;
+      }
+      
+      .print-header-right {
+        text-align: right;
+        color: #666;
+      }
+      
+      /* Print footer - fixed */
+      .print-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: var(--print-footer-height);
+        padding: 8px 12mm;
+        background: white;
+        border-top: 1px solid #ccc;
+        font-size: 8pt;
+        color: #666;
+        z-index: 1000;
+      }
+      
+      .print-footer-page::after {
+        content: "Page " counter(page) " of " counter(pages);
+      }
+      
+      /* Header card print styles */
+      .header-card {
+        border: 1px solid #666;
+        margin-bottom: 16px;
+      }
+      
+      .header-top {
+        background: #1D3557 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      
+      /* Force sections open */
+      .section.collapsed .section-content {
+        max-height: none;
+        padding: var(--spacing-lg);
+      }
+      
+      .section-header {
+        cursor: default;
+        background: #f5f5f5 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      
+      /* Table print styles */
+      .data-table {
+        font-size: 9pt;
+      }
+      
+      .data-table th {
+        background: #f0f0f0 !important;
+        border-bottom: 2px solid #333;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      
+      .data-table tbody tr:nth-child(even) {
+        background: #f9f9f9 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      
+      .data-table td {
+        border-bottom: 1px solid #ddd;
+      }
+      
+      /* Prevent bad breaks */
+      h2, h3, .section, .section-header {
+        break-inside: avoid;
+      }
+      
+      table, tr, .diagnosis-item, .contact-card {
+        break-inside: avoid;
+      }
+      
+      /* Page break utility */
+      .page-break {
+        break-before: page;
+      }
+      
+      /* Chips print styles */
+      .chip {
+        border: 1px solid #999;
+        background: transparent !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      
+      .chip.allergy {
+        border-color: #DC2626;
+      }
+      
+      /* Red flag list print */
+      .red-flag-list {
+        border: 2px solid #DC2626;
+        background: transparent !important;
+      }
+      
+      /* Links */
+      a {
+        color: #000;
+        text-decoration: underline;
+      }
+      
+      /* Watermark print */
+      [data-watermark="true"] .watermark {
+        color: rgba(0, 0, 0, 0.06);
+        font-size: 60px;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      
+      /* QR Code */
+      .qr-code {
+        border: 1px solid #333;
+      }
+      
+      /* Status badges */
+      .status-badge.final {
+        background: #059669 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      
+      .status-badge.draft {
+        background: #D97706 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      
+      /* Signature lines */
+      .signature-line {
+        border-bottom-color: #000;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Print-only fixed header -->
+  <header class="print-header" role="banner">
+    <div class="print-header-left">
+      <svg class="print-header-logo" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="8" width="24" height="24" rx="4" fill="#1D3557"/>
+        <path d="M14 14v12M8 20h12" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+        <text x="32" y="26" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" fill="#1D3557">Baines Hospital</text>
+      </svg>
+    </div>
+    <div class="print-header-right">
+      <div>Discharge Summary</div>
+      <div data-field="patient.mrn">MRN: MRN-2025-001234</div>
+    </div>
+  </header>
+
+  <!-- Print-only fixed footer -->
+  <footer class="print-footer" role="contentinfo">
+    <div>Baines Memorial Hospital • 1234 Medical Center Dr, Healthcare City, HC 12345 • (555) 123-4567</div>
+    <div class="print-footer-page"></div>
+    <div>Printed: <span id="print-timestamp"></span></div>
+  </footer>
+
+  <!-- Watermark (optional) -->
+  <div class="watermark" aria-hidden="true">CONFIDENTIAL – PHI</div>
+
+  <!-- Screen Toolbar -->
+  <nav class="toolbar no-print" role="navigation" aria-label="Document actions">
+    <div class="toolbar-left">
+      <svg class="toolbar-logo" viewBox="0 0 140 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="6" width="28" height="28" rx="5" fill="#1D3557"/>
+        <path d="M16 12v16M8 20h16" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+        <text x="36" y="28" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="700" fill="#1D3557">Baines Hospital</text>
+      </svg>
+    </div>
+    <div class="toolbar-right">
+      <select class="page-size-select" id="pageSize" aria-label="Page size">
+        <option value="a4">A4</option>
+        <option value="letter">US Letter</option>
+      </select>
+      
+      <div class="toolbar-divider"></div>
+      
+      <button class="btn" id="expandAll" aria-label="Expand all sections">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+        Expand All
+      </button>
+      <button class="btn" id="collapseAll" aria-label="Collapse all sections">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="18 15 12 9 6 15"/>
+        </svg>
+        Collapse All
+      </button>
+      
+      <div class="toolbar-divider"></div>
+      
+      <button class="btn" id="toggleWatermark" aria-label="Toggle watermark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        Watermark
+      </button>
+      <button class="btn" id="themeToggle" aria-label="Toggle high contrast theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+        Theme
+      </button>
+      
+      <div class="toolbar-divider"></div>
+      
+      <button class="btn btn-primary" id="printBtn" aria-label="Print document (Keyboard: P)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 6 2 18 2 18 9"/>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+          <rect x="6" y="14" width="12" height="8"/>
+        </svg>
+        Print<kbd class="kbd">P</kbd>
+      </button>
+      <button class="btn btn-primary" id="downloadPdf" aria-label="Download PDF (Keyboard: D)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        PDF<kbd class="kbd">D</kbd>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Document Content -->
+  <main class="document-container" role="main">
+    <!-- Header Identity Card -->
+    <article class="header-card">
+      <div class="header-top">
+        <div class="hospital-info">
+          <svg class="hospital-logo-print" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="40" height="40" rx="6" fill="white" fill-opacity="0.15"/>
+            <path d="M20 10v20M10 20h20" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+          <div>
+            <div class="hospital-name">Baines Memorial Hospital</div>
+            <div class="hospital-tagline">Excellence in Patient Care Since 1952</div>
+          </div>
+        </div>
+        <div class="document-status">
+          <div class="document-title">Discharge Summary</div>
+          <span class="status-badge final" data-field="status" id="documentStatus">FINAL</span>
+        </div>
+      </div>
+      
+      <div class="header-body">
+        <div class="header-grid">
+          <!-- Patient Information -->
+          <div class="info-section">
+            <div class="info-section-title">Patient Information</div>
+            <div class="patient-identity">
+              <div class="patient-avatar" data-field="patient.initials">JD</div>
+              <div class="patient-name-block">
+                <div class="patient-name" data-field="patient.name.full">John Michael Doe</div>
+                <div class="patient-mrn" data-field="patient.mrn">MRN: MRN-2025-001234</div>
+              </div>
+              <div class="qr-code" title="Scan for patient record">
+                <!-- Simple QR code SVG placeholder -->
+                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="64" height="64" fill="white"/>
+                  <rect x="8" y="8" width="16" height="16" fill="#1D3557"/>
+                  <rect x="40" y="8" width="16" height="16" fill="#1D3557"/>
+                  <rect x="8" y="40" width="16" height="16" fill="#1D3557"/>
+                  <rect x="12" y="12" width="8" height="8" fill="white"/>
+                  <rect x="44" y="12" width="8" height="8" fill="white"/>
+                  <rect x="12" y="44" width="8" height="8" fill="white"/>
+                  <rect x="28" y="8" width="4" height="4" fill="#1D3557"/>
+                  <rect x="28" y="16" width="4" height="4" fill="#1D3557"/>
+                  <rect x="28" y="28" width="8" height="8" fill="#1D3557"/>
+                  <rect x="8" y="28" width="4" height="4" fill="#1D3557"/>
+                  <rect x="16" y="28" width="4" height="4" fill="#1D3557"/>
+                  <rect x="40" y="28" width="4" height="4" fill="#1D3557"/>
+                  <rect x="52" y="28" width="4" height="4" fill="#1D3557"/>
+                  <rect x="40" y="40" width="4" height="4" fill="#1D3557"/>
+                  <rect x="48" y="40" width="4" height="4" fill="#1D3557"/>
+                  <rect x="40" y="48" width="4" height="4" fill="#1D3557"/>
+                  <rect x="48" y="52" width="8" height="4" fill="#1D3557"/>
+                  <rect x="52" y="44" width="4" height="8" fill="#1D3557"/>
+                </svg>
+              </div>
+            </div>
+            
+            <div class="info-row">
+              <div class="info-item">
+                <span class="info-label">Date of Birth</span>
+                <span class="info-value" data-field="patient.dob">March 15, 1958</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Age</span>
+                <span class="info-value" data-field="patient.age">66 years</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Sex</span>
+                <span class="info-value" data-field="patient.sex">Male</span>
+              </div>
+            </div>
+            
+            <div class="info-row">
+              <div class="info-item">
+                <span class="info-label">Phone</span>
+                <span class="info-value" data-field="patient.phone">(555) 987-6543</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Address</span>
+                <span class="info-value" data-field="patient.address">456 Oak Street, Apt 2B, Healthcare City, HC 12345</span>
+              </div>
+            </div>
+            
+            <div class="info-row">
+              <div class="info-item">
+                <span class="info-label">Insurance</span>
+                <span class="info-value" data-field="patient.insurance">BlueCross BlueShield PPO – ID: XYZ789012345</span>
+              </div>
+            </div>
+            
+            <div class="chips-row">
+              <span class="chip allergy">
+                <svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                Penicillin
+              </span>
+              <span class="chip allergy">Sulfa drugs</span>
+              <span class="chip" title="Code Status">Full Code</span>
+              <span class="chip" title="Isolation">Standard Precautions</span>
+            </div>
+          </div>
+          
+          <!-- Admission Details -->
+          <div class="info-section">
+            <div class="info-section-title">Admission Details</div>
+            
+            <div class="info-row">
+              <div class="info-item">
+                <span class="info-label">Admission Date/Time</span>
+                <span class="info-value" data-field="admission.datetime">January 2, 2025 at 14:32</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Discharge Date/Time</span>
+                <span class="info-value" data-field="discharge.datetime">January 5, 2025 at 11:00</span>
+              </div>
+            </div>
+            
+            <div class="info-row">
+              <div class="info-item">
+                <span class="info-label">Length of Stay</span>
+                <span class="info-value" data-field="admission.los">3 days</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Admission Type</span>
+                <span class="info-value" data-field="admission.type">Emergency</span>
+              </div>
+            </div>
+            
+            <div class="info-row">
+              <div class="info-item">
+                <span class="info-label">Attending Physician</span>
+                <span class="info-value" data-field="physician.attending">Dr. Sarah Chen, MD, FACC</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Service</span>
+                <span class="info-value" data-field="admission.service">Cardiology</span>
+              </div>
+            </div>
+            
+            <div class="info-row">
+              <div class="info-item">
+                <span class="info-label">Ward / Room / Bed</span>
+                <span class="info-value" data-field="admission.location">Cardiac Care Unit / Room 412 / Bed A</span>
+              </div>
+            </div>
+            
+            <div class="info-row">
+              <div class="info-item">
+                <span class="info-label">Consulting Physicians</span>
+                <span class="info-value" data-field="physician.consulting">Dr. Michael Roberts (Pulmonology), Dr. Lisa Park (Endocrinology)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- At a Glance Row -->
+      <div class="glance-row">
+        <div class="glance-item">
+          <span class="chip diagnosis">Primary: Acute NSTEMI</span>
+        </div>
+        <span class="glance-divider">|</span>
+        <div class="glance-item">
+          <span class="chip procedure">PCI with DES to LAD</span>
+        </div>
+        <span class="glance-divider">|</span>
+        <div class="glance-item">
+          <span class="chip disposition">Disposition: Home</span>
+        </div>
+        <span class="glance-divider">|</span>
+        <div class="glance-item">
+          <span class="chip followup">Follow-up: Jan 12, 2025</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- SECTION 1: Discharge Summary at a Glance -->
+    <section class="section" id="section-glance">
+      <a class="section-anchor" id="glance"></a>
+      <div class="section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="content-glance">
+        <h2 class="section-title">
+          <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          Discharge Summary at a Glance
+        </h2>
+        <div class="section-toggle no-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+      <div class="section-content" id="content-glance">
+        <ul class="bullet-list">
+          <li><strong>Reason for admission:</strong> Chest pain with elevated troponins, ECG changes consistent with NSTEMI</li>
+          <li><strong>Key procedures:</strong> Coronary angiography revealed 90% LAD stenosis; successful PCI with drug-eluting stent placement</li>
+          <li><strong>Hospital course:</strong> Uncomplicated post-procedure recovery; started on dual antiplatelet therapy and optimized cardiac medications</li>
+          <li><strong>Discharge condition:</strong> Stable, ambulating independently, tolerating regular diet, pain-free</li>
+          <li><strong>Key instructions:</strong> Strict medication compliance, cardiac rehabilitation enrollment, low-sodium diet, smoking cessation</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- SECTION 2: Diagnoses -->
+    <section class="section" id="section-diagnoses">
+      <a class="section-anchor" id="diagnoses"></a>
+      <div class="section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="content-diagnoses">
+        <h2 class="section-title">
+          <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+          </svg>
+          Diagnoses
+        </h2>
+        <div class="section-toggle no-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+      <div class="section-content" id="content-diagnoses">
+        <ul class="diagnosis-list">
+          <li class="diagnosis-item">
+            <span class="diagnosis-type primary">Primary</span>
+            <div class="diagnosis-text">
+              <div>Non-ST-elevation myocardial infarction (NSTEMI)</div>
+              <div class="diagnosis-code">ICD-10: I21.4</div>
+            </div>
+          </li>
+          <li class="diagnosis-item">
+            <span class="diagnosis-type secondary">Secondary</span>
+            <div class="diagnosis-text">
+              <div>Coronary artery disease, left anterior descending artery</div>
+              <div class="diagnosis-code">ICD-10: I25.10</div>
+            </div>
+          </li>
+          <li class="diagnosis-item">
+            <span class="diagnosis-type secondary">Secondary</span>
+            <div class="diagnosis-text">
+              <div>Essential hypertension</div>
+              <div class="diagnosis-code">ICD-10: I10</div>
+            </div>
+          </li>
+          <li class="diagnosis-item">
+            <span class="diagnosis-type secondary">Secondary</span>
+            <div class="diagnosis-text">
+              <div>Type 2 diabetes mellitus without complications</div>
+              <div class="diagnosis-code">ICD-10: E11.9</div>
+            </div>
+          </li>
+          <li class="diagnosis-item">
+            <span class="diagnosis-type secondary">Secondary</span>
+            <div class="diagnosis-text">
+              <div>Hyperlipidemia</div>
+              <div class="diagnosis-code">ICD-10: E78.5</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- SECTION 3: Procedures/Operations -->
+    <section class="section" id="section-procedures">
+      <a class="section-anchor" id="procedures"></a>
+      <div class="section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="content-procedures">
+        <h2 class="section-title">
+          <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          Procedures / Operations
+        </h2>
+        <div class="section-toggle no-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+      <div class="section-content" id="content-procedures">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Procedure</th>
+              <th>Physician</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="nowrap">Jan 3, 2025</td>
+              <td>Left heart catheterization with coronary angiography</td>
+              <td>Dr. Sarah Chen</td>
+              <td>Revealed 90% stenosis of proximal LAD</td>
+            </tr>
+            <tr>
+              <td class="nowrap">Jan 3, 2025</td>
+              <td>Percutaneous coronary intervention (PCI) with drug-eluting stent (DES)</td>
+              <td>Dr. Sarah Chen</td>
+              <td>Single 3.0 x 18mm Xience Sierra stent deployed to proximal LAD; TIMI 3 flow achieved</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SECTION 4: Hospital Course -->
+    <section class="section" id="section-course">
+      <a class="section-anchor" id="course"></a>
+      <div class="section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="content-course">
+        <h2 class="section-title">
+          <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+          Hospital Course
+        </h2>
+        <div class="section-toggle no-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+      <div class="section-content" id="content-course">
+        <div class="narrative">
+          <p>Mr. Doe is a 66-year-old male with a history of hypertension, type 2 diabetes, and hyperlipidemia who presented to the Emergency Department on January 2, 2025, with acute onset substernal chest pressure radiating to the left arm, associated with diaphoresis and shortness of breath. Initial ECG demonstrated ST depressions in leads V3-V6. Troponin I was elevated at 2.4 ng/mL (normal &lt;0.04).</p>
+          
+          <p>The patient was started on aspirin, heparin infusion, and atorvastatin, and admitted to the Cardiac Care Unit with a diagnosis of NSTEMI. He underwent coronary angiography on hospital day 2, which revealed 90% stenosis of the proximal LAD with TIMI 2 flow. Successful PCI was performed with deployment of a 3.0 x 18mm Xience Sierra drug-eluting stent, with excellent angiographic result and TIMI 3 flow post-intervention.</p>
+          
+          <p>Post-procedure, the patient was monitored in the CCU without complication. Dual antiplatelet therapy with aspirin and ticagrelor was initiated. Echocardiography demonstrated mild anteroseptal hypokinesis with preserved LVEF of 50-55%. The patient remained hemodynamically stable throughout his stay, with resolution of chest pain and normalization of serial troponins. He was transitioned to oral medications and ambulated without difficulty.</p>
+          
+          <p>The patient is being discharged home in stable condition with close cardiology follow-up arranged. He has been counseled extensively on medication compliance, particularly the importance of dual antiplatelet therapy, and enrolled in outpatient cardiac rehabilitation.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: Pertinent Results -->
+    <section class="section" id="section-results">
+      <a class="section-anchor" id="results"></a>
+      <div class="section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="content-results">
+        <h2 class="section-title">
+          <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+          </svg>
+          Pertinent Results &amp; Imaging
+        </h2>
+        <div class="section-toggle no-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+      <div class="section-content" id="content-results">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Test</th>
+              <th>Date</th>
+              <th>Result</th>
+              <th>Reference Range</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Troponin I (initial)</td>
+              <td class="nowrap">Jan 2</td>
+              <td class="result-abnormal">2.4 ng/mL ↑</td>
+              <td>&lt;0.04 ng/mL</td>
+              <td>Elevated, consistent with myocardial injury</td>
+            </tr>
+            <tr>
+              <td>Troponin I (peak)</td>
+              <td class="nowrap">Jan 3</td>
+              <td class="result-abnormal">8.7 ng/mL ↑</td>
+              <td>&lt;0.04 ng/mL</td>
+              <td>Peak value</td>
+            </tr>
+            <tr>
+              <td>Troponin I (discharge)</td>
+              <td class="nowrap">Jan 5</td>
+              <td class="result-normal">0.18 ng/mL</td>
+              <td>&lt;0.04 ng/mL</td>
+              <td>Trending down</td>
+            </tr>
+            <tr>
+              <td>BNP</td>
+              <td class="nowrap">Jan 2</td>
+              <td>245 pg/mL</td>
+              <td>&lt;100 pg/mL</td>
+              <td>Mildly elevated</td>
+            </tr>
+            <tr>
+              <td>Creatinine</td>
+              <td class="nowrap">Jan 5</td>
+              <td class="result-normal">1.0 mg/dL</td>
+              <td>0.7-1.3 mg/dL</td>
+              <td>Stable post-contrast</td>
+            </tr>
+            <tr>
+              <td>HbA1c</td>
+              <td class="nowrap">Jan 3</td>
+              <td class="result-abnormal">7.8% ↑</td>
+              <td>&lt;5.7%</td>
+              <td>Suboptimal glycemic control</td>
+            </tr>
+            <tr>
+              <td>LDL Cholesterol</td>
+              <td class="nowrap">Jan 3</td>
+              <td class="result-abnormal">142 mg/dL ↑</td>
+              <td>&lt;100 mg/dL</td>
+              <td>Elevated; high-intensity statin initiated</td>
+            </tr>
+            <tr>
+              <td>Echocardiogram</td>
+              <td class="nowrap">Jan 4</td>
+              <td colspan="2">LVEF 50-55%, mild anteroseptal hypokinesis</td>
+              <td>No significant valvular disease</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SECTION 6: Discharge Medications -->
+    <section class="section" id="section-medications">
+      <a class="section-anchor" id="medications"></a>
+      <div class="section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="content-medications">
+        <h2 class="section-title">
+          <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+          </svg>
+          Discharge Medications
+        </h2>
+        <div class="section-toggle no-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+      <div class="section-content" id="content-medications">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Medication</th>
+              <th>Dose</th>
+              <th>Route</th>
+              <th>Frequency</th>
+              <th>Instructions</th>
+              <th>Duration</th>
+              <th>Prescriber</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Aspirin</strong><span class="med-continued">Continued</span></td>
+              <td>81 mg</td>
+              <td>PO</td>
+              <td>Once daily</td>
+              <td>Take with food; do not discontinue</td>
+              <td>Lifelong</td>
+              <td>Dr. Chen</td>
+            </tr>
+            <tr>
+              <td><strong>Ticagrelor (Brilinta)</strong><span class="med-new">New</span></td>
+              <td>90 mg</td>
+              <td>PO</td>
+              <td>Twice daily</td>
+              <td>Critical: Do not miss doses; avoid high-dose aspirin</td>
+              <td>12 months minimum</td>
+              <td>Dr. Chen</td>
+            </tr>
+            <tr>
+              <td><strong>Atorvastatin (Lipitor)</strong><span class="med-new">New</span></td>
+              <td>80 mg</td>
+              <td>PO</td>
+              <td>Once daily at bedtime</td>
+              <td>High-intensity statin therapy</td>
+              <td>Ongoing</td>
+              <td>Dr. Chen</td>
+            </tr>
+            <tr>
+              <td><strong>Metoprolol Succinate (Toprol XL)</strong><span class="med-new">New</span></td>
+              <td>50 mg</td>
+              <td>PO</td>
+              <td>Once daily</td>
+              <td>Do not stop abruptly</td>
+              <td>Ongoing</td>
+              <td>Dr. Chen</td>
+            </tr>
+            <tr>
+              <td><strong>Lisinopril</strong><span class="med-continued">Continued</span></td>
+              <td>20 mg</td>
+              <td>PO</td>
+              <td>Once daily</td>
+              <td>For blood pressure and heart protection</td>
+              <td>Ongoing</td>
+              <td>Dr. Chen</td>
+            </tr>
+            <tr>
+              <td><strong>Metformin</strong><span class="med-continued">Continued</span></td>
+              <td>1000 mg</td>
+              <td>PO</td>
+              <td>Twice daily with meals</td>
+              <td>For diabetes; take with food</td>
+              <td>Ongoing</td>
+              <td>Dr. Park</td>
+            </tr>
+            <tr>
+              <td><strong>Pantoprazole</strong><span class="med-new">New</span></td>
+              <td>40 mg</td>
+              <td>PO</td>
+              <td>Once daily before breakfast</td>
+              <td>GI protection with dual antiplatelet therapy</td>
+              <td>Ongoing</td>
+              <td>Dr. Chen</td>
+            </tr>
+            <tr>
+              <td><strong>Nitroglycerin SL</strong><span class="med-new">New</span></td>
+              <td>0.4 mg</td>
+              <td>SL</td>
+              <td>PRN for chest pain</td>
+              <td>Take 1 tablet under tongue; if no relief in 5 min, call 911</td>
+              <td>As needed</td>
+              <td>Dr. Chen</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-note" style="margin-top: 12px;"><strong>Note:</strong> Bring all medications to follow-up appointments. Do not take any new medications, including over-the-counter drugs or supplements, without consulting your cardiologist.</p>
+      </div>
+    </section>
+
+    <!-- SECTION 7: Allergies -->
+    <section class="section" id="section-allergies">
+      <a class="section-anchor" id="allergies"></a>
+      <div class="section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="content-allergies">
+        <h2 class="section-title">
+          <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          Allergies &amp; Adverse Reactions
+        </h2>
+        <div class="section-toggle no-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+      <div class="section-content" id="content-allergies">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Allergen</th>
+              <th>Reaction Type</th>
+              <th>Severity</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Penicillin</strong></td>
+              <td>Anaphylaxis</td>
+              <td class="result-abnormal">Severe</td>
+              <td>Documented reaction in 2015; avoid all beta-lactams</td>
+            </tr>
+            <tr>
+              <td><strong>Sulfa drugs (Sulfonamides)</strong></td>
+              <td>Rash, hives</td>
+              <td>Moderate</td>
+              <td>Patient-reported; use alternatives</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SECTION 8: Discharge Instructions -->
+    <section class="section" id="section-instructions">
+      <a class="section-anchor" id="instructions"></a>
+      <div class="section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="content-instructions">
+        <h2 class="section-title">
+          <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/>
+          </svg>
+          Discharge Instructions
+        </h2>
+        <div class="section-toggle no-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+      <div class="section-content" id="content-instructions">
+        <div class="narrative">
+          <p>You have been treated for a heart attack (non-ST-elevation myocardial infarction) and had a stent placed in one of your heart arteries. Please follow these instructions carefully for your recovery:</p>
+          
+          <div class="instruction-block">
+            <div class="instruction-title">Medications</div>
+            <ul class="bullet-list">
+              <li><strong>Take all medications exactly as prescribed.</strong> The blood thinners (aspirin and ticagrelor) are critical to prevent stent clotting. Do not skip doses.</li>
+              <li>Never stop ticagrelor or aspirin without speaking to your cardiologist first—stopping suddenly can be life-threatening.</li>
+              <li>Refill prescriptions before they run out. Set reminders if needed.</li>
+            </ul>
+          </div>
+          
+          <div class="instruction-block">
+            <div class="instruction-title">Cardiac Rehabilitation</div>
+            <ul class="bullet-list">
+              <li>You have been referred to outpatient cardiac rehabilitation. This supervised exercise program is strongly recommended to improve your heart health and recovery.</li>
+              <li>The cardiac rehab team will contact you within 3 business days to schedule your first session.</li>
+            </ul>
+          </div>
+          
+          <div class="instruction-block">
+            <div class="instruction-title">Lifestyle Modifications</div>
+            <ul class="bullet-list">
+              <li><strong>Smoking:</strong> If you smoke, quitting is the single most important thing you can do. Resources are available; ask your care team.</li>
+              <li><strong>Diet:</strong> Follow a heart-healthy, low-sodium diet (less than 2,000 mg sodium per day). Limit saturated fats and avoid trans fats.</li>
+              <li><strong>Weight:</strong> Work toward a healthy weight. Your care team can provide guidance.</li>
+              <li><strong>Alcohol:</strong> Limit to one drink per day or less.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 9: Activity, Diet, Wound Care -->
+    <section class="section" id="section-activity">
+      <a class="section-anchor" id="activity"></a>
+      <div class="section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="content-activity">
+        <h2 class="section-title">
+          <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+          </svg>
+          Activity, Diet &amp; Wound Care
+        </h2>
+        <div class="section-toggle no-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+      <div class="section-content" id="content-activity">
+        <div class="instruction-block">
+          <div class="instruction-title">Activity Restrictions (First 1-2 Weeks)</div>
+          <ul class="bullet-list">
+            <li>No heavy lifting (more than 10 lbs / 4.5 kg) for 1 week</li>
+            <li>No driving for 1 week (or until cleared by your doctor)</li>
+            <li>Walk daily—start with 10-15 minute walks and gradually increase</li>
+            <li>Avoid strenuous exercise until cleared by cardiology</li>
+            <li>You may climb stairs, perform light household tasks, and shower</li>
+          </ul>
+        </div>
+        
+        <div class="instruction-block">
+          <div class="instruction-title">Diet Guidelines</div>
+          <ul class="bullet-list">
+            <li>Follow a heart-healthy diet: fruits, vegetables, whole grains, lean proteins</li>
+            <li>Limit sodium to less than 2,000 mg/day (avoid processed foods, canned soups, fast food)</li>
+            <li>Avoid saturated fats (fried foods, fatty meats, full-fat dairy)</li>
+            <li>Increase fiber intake (oats, beans, vegetables)</li>
+            <li>Consider consulting a dietitian for personalized guidance</li>
+          </ul>
+        </div>
+        
+        <div class="instruction-block">
+          <div class="instruction-title">Catheter/Puncture Site Care (Groin or Wrist)</div>
+          <ul class="bullet-list">
+            <li>Keep the site clean and dry for 24-48 hours</li>
+            <li>A small bruise is normal; it will fade over 1-2 weeks</li>
+            <li>Avoid soaking in bathtubs, pools, or hot tubs for 1 week</li>
+            <li>Do not apply lotions or ointments to the site</li>
+            <li><strong>Call your doctor if you notice:</strong> increased swelling, redness, warmth, drainage, fever, or if bleeding restarts</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 10: Follow-up Appointments -->
+    <section class="section" id="section-followup">
+      <a class="section-anchor" id="followup"></a>
+      <div class="section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="content-followup">
+        <h2 class="section-title">
+          <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          Follow-up Appointments
+        </h2>
+        <div class="section-toggle no-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+      <div class="section-content" id="content-followup">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Service / Provider</th>
+              <th>Location</th>
+              <th>Date / Time</th>
+              <th>Telehealth</th>
+              <th>Phone</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Cardiology</strong><br><span class="table-note">Dr. Sarah Chen</span></td>
+              <td>Baines Heart Center<br><span class="table-note">Suite 400</span></td>
+              <td class="nowrap">Jan 12, 2025<br>10:30 AM</td>
+              <td>—</td>
+              <td>(555) 123-4570</td>
+              <td>Post-PCI follow-up; bring medication list</td>
+            </tr>
+            <tr>
+              <td><strong>Cardiac Rehabilitation</strong><br><span class="table-note">Intake assessment</span></td>
+              <td>Cardiac Rehab Center<br><span class="table-note">Ground Floor</span></td>
+              <td class="nowrap">Jan 15, 2025<br>9:00 AM</td>
+              <td>—</td>
+              <td>(555) 123-4580</td>
+              <td>Wear comfortable clothes and sneakers</td>
+            </tr>
+            <tr>
+              <td><strong>Primary Care</strong><br><span class="table-note">Dr. James Wilson</span></td>
+              <td>Baines Medical Group</td>
+              <td class="nowrap">Jan 19, 2025<br>2:00 PM</td>
+              <td><a href="#">Join Video Call</a></td>
+              <td>(555) 123-4000</td>
+              <td>Diabetes and BP management</td>
+            </tr>
+            <tr>
+              <td><strong>Endocrinology</strong><br><span class="table-note">Dr. Lisa Park</span></td>
+              <td>Diabetes & Endocrine Clinic</td>
+              <td class="nowrap">Jan 26, 2025<br>11:00 AM</td>
+              <td>—</td>
+              <td>(555) 123-4590</td>
+              <td>Diabetes optimization; fasting labs prior</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SECTION 11: Red Flags -->
+    <section class="section" id="section-redflags">
+      <a class="section-anchor" id="redflags"></a>
+      <div class="section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="content-redflags">
+        <h2 class="section-title">
+          <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Red Flags – When to Seek Immediate Care
+        </h2>
+        <div class="section-toggle no-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+      <div class="section-content" id="content-redflags">
+        <div class="red-flag-list">
+          <p style="margin-top: 0; font-weight: 600;">Call 911 or go to the nearest Emergency Department immediately if you experience:</p>
+          <ul class="bullet-list">
+            <li><strong>Chest pain or pressure</strong> that is severe, lasts more than 5 minutes, or is not relieved by nitroglycerin</li>
+            <li><strong>Shortness of breath</strong> at rest or that suddenly worsens</li>
+            <li><strong>Pain spreading</strong> to your arm, jaw, neck, or back</li>
+            <li><strong>Sudden weakness or numbness</strong> on one side of the body, difficulty speaking, or vision changes (signs of stroke)</li>
+            <li><strong>Fainting or near-fainting</strong> (syncope, lightheadedness)</li>
+            <li><strong>Rapid or irregular heartbeat</strong> (palpitations) lasting more than a few minutes</li>
+            <li><strong>Swelling in legs or ankles</strong> with shortness of breath</li>
+            <li><strong>Uncontrolled bleeding</strong> or large bruising from puncture site</li>
+            <li><strong>Signs of allergic reaction</strong>: hives, swelling of face/lips/tongue, difficulty breathing</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 12: Contacts -->
+    <section class="section" id="section-contacts">
+      <a class="section-anchor" id="contacts"></a>
+      <div class="section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="content-contacts">
+        <h2 class="section-title">
+          <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+          </svg>
+          Important Contacts
+        </h2>
+        <div class="section-toggle no-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+      <div class="section-content" id="content-contacts">
+        <div class="contact-grid">
+          <div class="contact-card">
+            <div class="contact-title">Cardiology Office</div>
+            <div class="contact-value">
+              <a href="tel:+15551234570">(555) 123-4570</a><br>
+              Mon–Fri, 8 AM – 5 PM
+            </div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-title">Attending Physician</div>
+            <div class="contact-value">
+              Dr. Sarah Chen, MD<br>
+              <a href="tel:+15551234571">(555) 123-4571</a>
+            </div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-title">Hospital Main Line</div>
+            <div class="contact-value">
+              <a href="tel:+15551234567">(555) 123-4567</a><br>
+              24/7
+            </div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-title">After-Hours / Nurse Line</div>
+            <div class="contact-value">
+              <a href="tel:+15551234599">(555) 123-4599</a><br>
+              Available 24/7
+            </div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-title">Pharmacy (Discharge Rx)</div>
+            <div class="contact-value">
+              Baines Hospital Pharmacy<br>
+              <a href="tel:+15551234550">(555) 123-4550</a>
+            </div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-title">Emergency</div>
+            <div class="contact-value" style="color: #DC2626; font-weight: 600;">
+              Call 911
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 13: Billing (Collapsed by default) -->
+    <section class="section collapsed" id="section-billing">
+      <a class="section-anchor" id="billing"></a>
+      <div class="section-header" role="button" tabindex="0" aria-expanded="false" aria-controls="content-billing">
+        <h2 class="section-title">
+          <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+          </svg>
+          Billing &amp; Insurance Summary
+        </h2>
+        <div class="section-toggle no-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+      <div class="section-content" id="content-billing">
+        <div class="info-row" style="margin-bottom: 16px;">
+          <div class="info-item">
+            <span class="info-label">Insurance Provider</span>
+            <span class="info-value">BlueCross BlueShield PPO</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Member ID</span>
+            <span class="info-value">XYZ789012345</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Pre-Authorization #</span>
+            <span class="info-value">PA-2025-00456789</span>
+          </div>
+        </div>
+        <p>A detailed itemized bill will be mailed separately. For billing questions, please contact Patient Financial Services at <a href="tel:+15551234600">(555) 123-4600</a> or email <a href="mailto:billing@baineshospital.com">billing@baineshospital.com</a>.</p>
+      </div>
+    </section>
+
+    <!-- SECTION 14: Signatures -->
+    <section class="section" id="section-signatures">
+      <a class="section-anchor" id="signatures"></a>
+      <div class="section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="content-signatures">
+        <h2 class="section-title">
+          <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 19.5v-15A2.5 2.5 0 0 0 17.5 2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22h11a2.5 2.5 0 0 0 2.5-2.5Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h4"/>
+          </svg>
+          Signatures &amp; Authentication
+        </h2>
+        <div class="section-toggle no-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+      <div class="section-content" id="content-signatures">
+        <div class="signatures-grid">
+          <div class="signature-block">
+            <div class="signature-line"></div>
+            <div class="signature-label">Attending Physician Signature</div>
+            <div class="signature-details">
+              Dr. Sarah Chen, MD, FACC<br>
+              License #: MD-123456<br>
+              NPI: 1234567890
+            </div>
+          </div>
+          <div class="signature-block">
+            <div class="signature-line"></div>
+            <div class="signature-label">Date / Time</div>
+            <div class="signature-details">
+              January 5, 2025 at 10:45 AM
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-top: 32px; padding-top: 16px; border-top: 1px dashed var(--border);">
+          <p style="font-size: var(--font-size-sm); color: var(--muted); margin-bottom: 16px;">
+            <strong>Patient/Guardian Acknowledgment:</strong> I have received a copy of this discharge summary, my discharge instructions, and my medication list. I have had the opportunity to ask questions and understand my follow-up care plan.
+          </p>
+          <div class="signatures-grid">
+            <div class="signature-block">
+              <div class="signature-line"></div>
+              <div class="signature-label">Patient / Authorized Representative Signature</div>
+            </div>
+            <div class="signature-block">
+              <div class="signature-line"></div>
+              <div class="signature-label">Date</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 15: Legal Notice -->
+    <section class="section" id="section-legal">
+      <a class="section-anchor" id="legal"></a>
+      <div class="section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="content-legal">
+        <h2 class="section-title">
+          <svg class="section-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          Confidentiality Notice
+        </h2>
+        <div class="section-toggle no-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+      <div class="section-content" id="content-legal">
+        <div class="legal-notice">
+          <strong>CONFIDENTIAL – PROTECTED HEALTH INFORMATION (PHI)</strong><br><br>
+          This document contains confidential medical information protected under the Health Insurance Portability and Accountability Act (HIPAA) of 1996. This information is intended solely for the use of the individual patient named herein and authorized healthcare providers involved in the patient's care. Unauthorized disclosure, copying, distribution, or use of this information is strictly prohibited and may be subject to civil and criminal penalties.<br><br>
+          If you have received this document in error, please notify Baines Memorial Hospital Health Information Management at (555) 123-4560 immediately and destroy all copies.
+        </div>
+      </div>
+    </section>
+
+    <!-- Document Footer -->
+    <footer class="document-footer">
+      <div class="legal-notice" style="background: transparent; border: none; padding: 0; text-align: center;">
+        <strong>Baines Memorial Hospital</strong><br>
+        1234 Medical Center Drive, Healthcare City, HC 12345<br>
+        Phone: (555) 123-4567 | Fax: (555) 123-4568 | www.baineshospital.com<br><br>
+        <span style="font-size: 8pt;">Document ID: DS-2025-001234-001 | Generated: January 5, 2025 11:00 AM EST</span>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    // ==========================================================================
+    // Sample Data (for binding demonstration)
+    // ==========================================================================
+    const sampleData = {
+      patient: {
+        name: { first: "John", middle: "Michael", last: "Doe", full: "John Michael Doe" },
+        mrn: "MRN-2025-001234",
+        dob: "March 15, 1958",
+        age: "66 years",
+        sex: "Male",
+        phone: "(555) 987-6543",
+        address: "456 Oak Street, Apt 2B, Healthcare City, HC 12345",
+        insurance: "BlueCross BlueShield PPO – ID: XYZ789012345",
+        initials: "JD"
+      },
+      admission: {
+        datetime: "January 2, 2025 at 14:32",
+        type: "Emergency",
+        los: "3 days",
+        service: "Cardiology",
+        location: "Cardiac Care Unit / Room 412 / Bed A"
+      },
+      discharge: {
+        datetime: "January 5, 2025 at 11:00"
+      },
+      physician: {
+        attending: "Dr. Sarah Chen, MD, FACC",
+        consulting: "Dr. Michael Roberts (Pulmonology), Dr. Lisa Park (Endocrinology)"
+      },
+      status: "FINAL"
+    };
+
+    // ==========================================================================
+    // DOM Ready
+    // ==========================================================================
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize print timestamp
+      updatePrintTimestamp();
+      
+      // Bind sample data to DOM
+      bindDataToDOM(sampleData);
+      
+      // Initialize section states from localStorage
+      initSectionStates();
+      
+      // Set up event listeners
+      setupEventListeners();
+      
+      // Keyboard shortcuts
+      setupKeyboardShortcuts();
+    });
+
+    // ==========================================================================
+    // Data Binding
+    // ==========================================================================
+    function bindDataToDOM(data) {
+      document.querySelectorAll('[data-field]').forEach(el => {
+        const field = el.getAttribute('data-field');
+        const value = getNestedValue(data, field);
+        if (value !== undefined && value !== null) {
+          el.textContent = el.tagName === 'INPUT' ? '' : value;
+          if (el.tagName === 'INPUT') el.value = value;
+        }
+      });
+    }
+
+    function getNestedValue(obj, path) {
+      return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+    }
+
+    // ==========================================================================
+    // Section Collapse/Expand
+    // ==========================================================================
+    function initSectionStates() {
+      const saved = JSON.parse(localStorage.getItem('dischargeSummary_sections') || '{}');
+      document.querySelectorAll('.section').forEach(section => {
+        const id = section.id;
+        if (saved[id] === 'collapsed') {
+          section.classList.add('collapsed');
+          section.querySelector('.section-header').setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    function saveSectionStates() {
+      const states = {};
+      document.querySelectorAll('.section').forEach(section => {
+        states[section.id] = section.classList.contains('collapsed') ? 'collapsed' : 'expanded';
+      });
+      localStorage.setItem('dischargeSummary_sections', JSON.stringify(states));
+    }
+
+    function toggleSection(header) {
+      const section = header.closest('.section');
+      const isCollapsed = section.classList.toggle('collapsed');
+      header.setAttribute('aria-expanded', !isCollapsed);
+      saveSectionStates();
+    }
+
+    function expandAll() {
+      document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('collapsed');
+        section.querySelector('.section-header').setAttribute('aria-expanded', 'true');
+      });
+      saveSectionStates();
+    }
+
+    function collapseAll() {
+      document.querySelectorAll('.section').forEach(section => {
+        section.classList.add('collapsed');
+        section.querySelector('.section-header').setAttribute('aria-expanded', 'false');
+      });
+      saveSectionStates();
+    }
+
+    // ==========================================================================
+    // Event Listeners
+    // ==========================================================================
+    function setupEventListeners() {
+      // Section headers (collapse/expand)
+      document.querySelectorAll('.section-header').forEach(header => {
+        header.addEventListener('click', () => toggleSection(header));
+        header.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleSection(header);
+          }
+        });
+      });
+
+      // Print button
+      document.getElementById('printBtn').addEventListener('click', () => {
+        updatePrintTimestamp();
+        window.print();
+      });
+
+      // Download PDF button
+      document.getElementById('downloadPdf').addEventListener('click', downloadPDF);
+
+      // Expand/Collapse all
+      document.getElementById('expandAll').addEventListener('click', expandAll);
+      document.getElementById('collapseAll').addEventListener('click', collapseAll);
+
+      // Page size selector
+      document.getElementById('pageSize').addEventListener('change', (e) => {
+        document.documentElement.setAttribute('data-page-size', e.target.value);
+      });
+
+      // Theme toggle
+      document.getElementById('themeToggle').addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        document.documentElement.setAttribute('data-theme', current === 'high-contrast' ? 'light' : 'high-contrast');
+      });
+
+      // Watermark toggle
+      document.getElementById('toggleWatermark').addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-watermark');
+        document.documentElement.setAttribute('data-watermark', current === 'true' ? 'false' : 'true');
+      });
+    }
+
+    // ==========================================================================
+    // Keyboard Shortcuts
+    // ==========================================================================
+    function setupKeyboardShortcuts() {
+      document.addEventListener('keydown', (e) => {
+        // Ignore if user is typing in an input
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        
+        if (e.key === 'p' || e.key === 'P') {
+          e.preventDefault();
+          updatePrintTimestamp();
+          window.print();
+        }
+        if (e.key === 'd' || e.key === 'D') {
+          e.preventDefault();
+          downloadPDF();
+        }
+      });
+    }
+
+    // ==========================================================================
+    // PDF Download
+    // ==========================================================================
+    function downloadPDF() {
+      // Check if html2pdf is available, otherwise provide instructions
+      if (typeof html2pdf !== 'undefined') {
+        const element = document.querySelector('.document-container');
+        const opt = {
+          margin: [12, 12, 12, 12],
+          filename: 'Discharge_Summary_' + sampleData.patient.mrn + '.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+        html2pdf().set(opt).from(element).save();
+      } else {
+        // Show user-friendly message
+        const msg = 'To download as PDF:\n\n' +
+                    '1. Press Ctrl+P (or Cmd+P on Mac)\n' +
+                    '2. Select "Save as PDF" as the destination\n' +
+                    '3. Click Save\n\n' +
+                    'This will create a high-quality PDF of the document.';
+        alert(msg);
+      }
+    }
+
+    // ==========================================================================
+    // Utilities
+    // ==========================================================================
+    function updatePrintTimestamp() {
+      const now = new Date();
+      const formatted = now.toISOString().replace('T', ' ').slice(0, 19);
+      document.getElementById('print-timestamp').textContent = formatted;
+    }
+
+    // Toggle document status (for demo purposes)
+    function toggleStatus() {
+      const badge = document.getElementById('documentStatus');
+      if (badge.classList.contains('final')) {
+        badge.classList.remove('final');
+        badge.classList.add('draft');
+        badge.textContent = 'DRAFT';
+      } else {
+        badge.classList.remove('draft');
+        badge.classList.add('final');
+        badge.textContent = 'FINAL';
+      }
+    }
+  </script>
+</body>
+</html>

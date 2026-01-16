@@ -1,0 +1,13 @@
+project_id = "aopnigbeitzopjncgonp"
+
+[functions.gooddoc-chat]
+verify_jwt = false
+
+[functions.lab-diagnostics-ai]
+verify_jwt = false
+
+[functions.patient-ai-summary]
+verify_jwt = false
+
+[functions.doctor-availability]
+verify_jwt = false
