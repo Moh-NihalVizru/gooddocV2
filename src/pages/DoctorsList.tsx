@@ -491,9 +491,6 @@ export default function DoctorsList() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleView(doctor)}>
-                          View
-                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleEdit(doctor.id)}>
                           <Edit className="w-4 h-4 mr-2" />
                           Edit

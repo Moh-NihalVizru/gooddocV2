@@ -6,8 +6,6 @@
  * Set VITE_AUTH_DEMO=false in production to disable.
  */
 
-import { authService } from '@/services/authService';
-
 const SESSION_KEY = 'gooddoc_session';
 const USERS_KEY = 'gooddoc_users';
 
@@ -172,35 +170,17 @@ export const getSession = (): Session | null => {
 
 // Check if user is authenticated
 export const isAuthenticated = (): boolean => {
-  // First check AuthService (API-based auth)
-  if (authService.isAuthenticated()) {
-    return true;
-  }
-  // Fallback to local session
   return getSession() !== null;
 };
 
 // Get current user
 export const getCurrentUser = (): User | null => {
-  // First try to get user from AuthService (API-based auth)
-  const apiUser = authService.getCurrentUser();
-  if (apiUser) {
-    return {
-      username: apiUser.email,
-      email: apiUser.email,
-      fullName: `${apiUser.firstName} ${apiUser.lastName}`.trim(),
-    };
-  }
-  // Fallback to local session
   const session = getSession();
   return session?.user || null;
 };
 
 // Logout
 export const logout = (): void => {
-  // Clear AuthService tokens
-  authService.clearTokens();
-  // Clear local session
   localStorage.removeItem(SESSION_KEY);
 };
 

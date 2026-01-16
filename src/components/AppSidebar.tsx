@@ -5,6 +5,7 @@ import logoIcon from "@/assets/logo-icon.svg";
 import { useSidebarContext } from "@/contexts/SidebarContext";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { logout } from "@/lib/auth";
+import { authService } from "@/services/authService";
 import { toast } from "sonner";
 
 // Import custom icons
@@ -37,9 +38,17 @@ export function AppSidebar() {
   const { isCollapsed, toggleSidebar } = useSidebarContext();
 
   const handleSignOut = () => {
-    logout();
+    // Clear all authentication data
+    logout(); // Clears demo session
+    authService.clearTokens(); // Clears JWT tokens
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userId');
+    sessionStorage.removeItem('userEmail');
+    sessionStorage.removeItem('userId');
+    
     toast.success('Signed out successfully');
-    navigate('/auth', { replace: true });
+    // Use window.location to force a full page reload and ensure auth is re-checked
+    window.location.href = '/auth';
   };
 
   return (

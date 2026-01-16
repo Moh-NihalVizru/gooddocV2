@@ -9,6 +9,7 @@ import { CalendarWidget } from "@/components/CalendarWidget";
 import { OverviewKpiCard } from "@/components/overview/OverviewKpiCard";
 import { postToWorkflow } from "@/services/apiService";
 import { toast } from "sonner";
+import { authService } from "@/services/authService";
 import { 
   BedDouble, 
   Stethoscope, 
@@ -152,13 +153,25 @@ const Overview = () => {
   const isMountedRef = useRef(true);
 
   const fetchOverviewData = async () => {
-    // Get user email and ID from localStorage
-    const userEmail = localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
-    const userId = localStorage.getItem("userId") || sessionStorage.getItem("userId");
+    // Get user email and ID from localStorage, or from auth service
+    let userEmail = localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
+    let userId = localStorage.getItem("userId") || sessionStorage.getItem("userId");
+
+    // If not found in storage, try to get from auth service (JWT token)
+    if (!userEmail || !userId) {
+      const currentUser = authService.getCurrentUser();
+      if (currentUser) {
+        userEmail = currentUser.email || undefined;
+        userId = currentUser.id?.toString() || undefined;
+        // Store for future use
+        if (userEmail) localStorage.setItem("userEmail", userEmail);
+        if (userId) localStorage.setItem("userId", userId);
+      }
+    }
 
     if (!userEmail || !userId) {
       toast.error("User authentication required. Please login again.");
-      navigate("/login");
+      navigate("/auth");
       return;
     }
 

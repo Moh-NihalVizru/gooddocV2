@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { isAuthenticated } from '@/lib/auth';
+import { isAuthenticated as isDemoAuthenticated } from '@/lib/auth';
+import { authService } from '@/services/authService';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { toast } from 'sonner';
 
@@ -10,9 +11,9 @@ import logoSvg from '@/assets/baines-logo-full.svg';
 export default function Auth() {
   const navigate = useNavigate();
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated (check both demo and API auth)
   useEffect(() => {
-    if (isAuthenticated()) {
+    if (isDemoAuthenticated() || authService.isAuthenticated()) {
       navigate('/', { replace: true });
     }
   }, [navigate]);

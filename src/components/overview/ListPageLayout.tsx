@@ -62,6 +62,8 @@ export interface RowAction<T> {
   label: string;
   onClick: (row: T) => void;
   hidden?: (row: T) => boolean;
+  icon?: React.ReactNode;
+  destructive?: boolean;
 }
 
 // URL param to filter label mapping
@@ -348,7 +350,9 @@ export function ListPageLayout<T>({
                                     <DropdownMenuItem
                                       key={action.label}
                                       onClick={() => action.onClick(row)}
+                                      className={action.destructive ? "text-destructive focus:text-destructive" : ""}
                                     >
+                                      {action.icon && <span className="mr-2">{action.icon}</span>}
                                       {action.label}
                                     </DropdownMenuItem>
                                   ))}

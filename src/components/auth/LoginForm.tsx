@@ -54,6 +54,14 @@ export function LoginForm({ onForgotPassword }: LoginFormProps) {
         fullName: `${user.firstName} ${user.lastName}`.trim(),
       });
 
+      // Store user email and ID for API calls
+      if (user.email) {
+        localStorage.setItem('userEmail', user.email);
+      }
+      if (user.id) {
+        localStorage.setItem('userId', user.id.toString());
+      }
+
       toast.success('Welcome back!', {
         description: `Signed in as ${user.firstName} ${user.lastName}`,
       });

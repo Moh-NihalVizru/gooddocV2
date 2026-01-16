@@ -3,7 +3,8 @@ import { ListPageLayout, Column, Filter, RowAction, UrlParamFilter } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { doctorsOnDuty, opDoctors, ipDoctors, otherDoctors, DoctorOnDutyRecord } from "@/data/overview.mock";
-import { Stethoscope } from "lucide-react";
+import { Stethoscope, Eye, Pencil, CalendarDays, PlusCircle, Ban } from "lucide-react";
+import { DoctorSlotsPopover } from "@/components/doctors/DoctorSlotsPopover";
 
 const roleStyles: Record<DoctorOnDutyRecord["role"], string> = {
   "Onsite": "bg-green-100 text-green-700",
@@ -204,9 +205,11 @@ const DoctorsOnDuty = () => {
           const index = data.findIndex(d => d.doctorName === row.doctorName && d.contactPager === row.contactPager);
           const { total, completed } = getAppointmentData(index);
           return (
-            <Badge className="bg-primary/10 text-primary">
-              {completed}/{total} Completed
-            </Badge>
+            <DoctorSlotsPopover
+              doctorName={row.doctorName}
+              totalSlots={total}
+              completedSlots={completed}
+            />
           );
         }
       },
@@ -250,8 +253,35 @@ const DoctorsOnDuty = () => {
     { paramKey: "type", paramValue: "other", displayLabel: "Emergency Doctors", count: otherDoctors.length },
   ];
 
+  const getDoctorSlug = (name: string) => name.replace("Dr. ", "").replace(/\s+/g, "-").toLowerCase();
+
   const rowActions: RowAction<DoctorOnDutyRecord>[] = [
-    { label: "View Doctor", onClick: (row) => navigate(`/doctors/${row.doctorName.replace("Dr. ", "").replace(/\s+/g, "-").toLowerCase()}`) },
+    { 
+      label: "Edit", 
+      icon: <Pencil className="w-4 h-4" />,
+      onClick: (row) => navigate(`/doctors/${getDoctorSlug(row.doctorName)}/edit`) 
+    },
+    {
+      label: "View Calendar", 
+      icon: <CalendarDays className="w-4 h-4" />,
+      onClick: (row) => navigate(`/doctors/${getDoctorSlug(row.doctorName)}/calendar`) 
+    },
+    { 
+      label: "Edit Schedule", 
+      icon: <Pencil className="w-4 h-4" />,
+      onClick: (row) => navigate(`/doctors/${getDoctorSlug(row.doctorName)}/schedule`) 
+    },
+    { 
+      label: "Add Leave", 
+      icon: <PlusCircle className="w-4 h-4" />,
+      onClick: (row) => navigate(`/doctors/${getDoctorSlug(row.doctorName)}/leave`) 
+    },
+    { 
+      label: "Deactivate", 
+      icon: <Ban className="w-4 h-4" />,
+      destructive: true,
+      onClick: (row) => console.log("Deactivate doctor:", row.doctorName) 
+    },
   ];
 
   return (

@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import { isAuthenticated } from '@/lib/auth';
+import { isAuthenticated as isDemoAuthenticated } from '@/lib/auth';
+import { authService } from '@/services/authService';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -7,7 +8,8 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const location = useLocation();
-  const authenticated = isAuthenticated();
+  // Check both demo auth and real API auth
+  const authenticated = isDemoAuthenticated() || authService.isAuthenticated();
 
   if (!authenticated) {
     // Redirect to auth page, preserving the intended destination
