@@ -28,10 +28,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { 
-  Search, 
-  X, 
-  ChevronLeft, 
+import {
+  Search,
+  X,
+  ChevronLeft,
   ChevronRight,
   MoreHorizontal,
   ArrowUpDown,
@@ -40,6 +40,8 @@ import {
 } from "lucide-react";
 import { CalendarWidget } from "@/components/CalendarWidget";
 import { PageKey } from "@/lib/pageSubtextConfig";
+
+import { DateRange } from "react-day-picker";
 
 export interface Column<T> {
   key: keyof T | string;
@@ -94,6 +96,10 @@ interface ListPageLayoutProps<T> {
   urlParamFilters?: UrlParamFilter[];
   customHeaderContent?: React.ReactNode;
   pageKey?: PageKey;
+  selectedDate?: Date;
+  selectedRange?: DateRange;
+  onDateChange?: (date: Date) => void;
+  onRangeChange?: (range: DateRange | undefined) => void;
 }
 
 export function ListPageLayout<T>({
@@ -116,6 +122,10 @@ export function ListPageLayout<T>({
   urlParamFilters = [],
   customHeaderContent,
   pageKey = "default",
+  selectedDate,
+  selectedRange,
+  onDateChange,
+  onRangeChange,
 }: ListPageLayoutProps<T>) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -172,10 +182,10 @@ export function ListPageLayout<T>({
   return (
     <div className="flex min-h-screen bg-background">
       <AppSidebar />
-      
+
       <PageContent>
         <AppHeader breadcrumbs={breadcrumbs} />
-        
+
         <main className="p-6">
           {/* Header */}
           <Card className="p-6 mb-6">
@@ -199,7 +209,14 @@ export function ListPageLayout<T>({
               </div>
               <div className="flex items-center gap-4">
                 {customHeaderContent}
-                <CalendarWidget pageKey={pageKey} showSubtext={true} />
+                <CalendarWidget
+                  pageKey={pageKey}
+                  showSubtext={true}
+                  selectedDate={selectedDate}
+                  selectedRange={selectedRange}
+                  onDateChange={onDateChange}
+                  onRangeChange={onRangeChange}
+                />
               </div>
             </div>
           </Card>

@@ -15,7 +15,7 @@ export interface OPPatientRecord {
   department: string;
   provider: string;
   visitReason: string;
-  status: "Scheduled" | "Pending" | "Checked-in" | "With Doctor" | "Awaiting Billing" | "Completed" | "No-show" | "Canceled";
+  status: "Scheduled" | "Pending" | "Checked-in" | "With Doctor" | "Awaiting Billing" | "Completed" | "No-show" | "Canceled" | "Open";
   checkInTime?: string;
   waitingTime?: string;
   tokenQueueNo?: string;
@@ -317,13 +317,13 @@ function generateOPPatient(index: number, statusOverride?: OPPatientRecord["stat
   const appointmentHour = 8 + Math.floor(index / 50);
   const appointmentDate = new Date(now);
   appointmentDate.setHours(appointmentHour, (index * 7) % 60, 0, 0);
-  
-  const checkInDate = status !== "Scheduled" && status !== "Pending" && status !== "No-show" && status !== "Canceled" 
-    ? subMinutes(appointmentDate, Math.floor(Math.random() * 15)) 
+
+  const checkInDate = status !== "Scheduled" && status !== "Pending" && status !== "No-show" && status !== "Canceled"
+    ? subMinutes(appointmentDate, Math.floor(Math.random() * 15))
     : undefined;
-  
-  const waitingMins = status === "Checked-in" || status === "With Doctor" 
-    ? Math.floor(Math.random() * 45) + 5 
+
+  const waitingMins = status === "Checked-in" || status === "With Doctor"
+    ? Math.floor(Math.random() * 45) + 5
     : undefined;
 
   // Token only assigned after check-in (not for Scheduled, Pending, No-show, Canceled)
@@ -372,7 +372,7 @@ function generateIPPatient(index: number, isNewAdmission = false, isERCase = fal
   const admitDaysAgo = isNewAdmission ? 0 : Math.floor(Math.random() * 14) + 1;
   const admitDate = subDays(now, admitDaysAgo);
   admitDate.setHours(8 + Math.floor(Math.random() * 10), Math.floor(Math.random() * 60), 0, 0);
-  
+
   const bedClasses: IPPatientRecord["bedClass"][] = ["ICU", "HDU", "Private", "Ward"];
   const bedClass = bedClasses[index % bedClasses.length];
   const wardMap = { ICU: "ICU", HDU: "HDU", Private: "Private Wing", Ward: `Ward-${["A", "B", "C", "D"][index % 4]}` };
@@ -439,10 +439,10 @@ function generateBed(index: number, typeOverride?: BedRecord["bedType"]): BedRec
   const statuses: BedRecord["status"][] = ["Available", "Available", "Available", "Available", "Reserved"];
   const status = statuses[index % statuses.length];
   const wardMap = { ICU: "ICU", HDU: "HDU", Ward: `Ward-${["A", "B", "C"][index % 3]}`, Private: "Private Wing", Isolation: "Isolation" };
-  
+
   const rateMap = { ICU: 15000, HDU: 10000, Ward: 2000, Private: 8000, Isolation: 6000 };
   const totalMap = { ICU: 20000, HDU: 13500, Ward: 2800, Private: 10500, Isolation: 8500 };
-  
+
   const bedNo = `${1000 + index + 1}`;
   const hasTransfer = status === "Reserved" && index % 3 === 0;
   const fromWard = `Ward-${["A", "B", "C"][(index + 1) % 3]}`;
@@ -479,7 +479,7 @@ function generateDischargedPatient(index: number, isPending = false): IPPatientR
   const dischargeDate = isPending ? addDays(now, 0) : now;
   dischargeDate.setHours(8 + Math.floor(index / 5), (index * 12) % 60, 0, 0);
   const admitDate = subDays(dischargeDate, 2 + Math.floor(Math.random() * 10));
-  
+
   const bedClasses: IPPatientRecord["bedClass"][] = ["ICU", "HDU", "Private", "Ward"];
   const bedClass = bedClasses[index % bedClasses.length];
   const wardMap = { ICU: "ICU", HDU: "HDU", Private: "Private Wing", Ward: `Ward-${["A", "B", "C", "D"][index % 4]}` };
@@ -556,7 +556,7 @@ function generateDoctorOnDuty(index: number): DoctorOnDutyRecord {
   const role = roles[index % roles.length];
   const locations = ["OPD", "ER", "Ward", "OR", "ICU", "HDU", "Radiology", "Lab"];
   const currentLocation = locations[index % locations.length];
-  
+
   // Determine duty context based on role and location
   let dutyContext: "OP" | "IP" | "Other" = "Other";
   if (role === "In OPD" || currentLocation === "OPD") {
@@ -569,11 +569,11 @@ function generateDoctorOnDuty(index: number): DoctorOnDutyRecord {
   const primaryUnits = ["ICU", "HDU", "Ward-A", "Ward-B", "Ward-C"];
   const contexts = ["Radiology Reading", "Pathology/Lab", "Telemedicine", "Admin", "Education/Academic", "Research"];
   const degreesList = [
-    "MBBS, MD", 
-    "MBBS, MS", 
-    "MBBS, MD, DM", 
-    "MBBS, MS, MCh", 
-    "MBBS, DNB", 
+    "MBBS, MD",
+    "MBBS, MS",
+    "MBBS, MD, DM",
+    "MBBS, MS, MCh",
+    "MBBS, DNB",
     "MBBS, MD, FRCP",
     "MBBS, MS, FRCS",
     "MBBS, MD, PhD"
@@ -761,9 +761,9 @@ function generateMedicineOrder(index: number): MedicineOrderRecord {
   const orderAmount = [500, 800, 1200, 1500, 2000, 2500][index % 6];
   const paymentStatuses = ["Paid", "Pending", "Partially Paid", "Waived"] as const;
   const paymentStatus = paymentStatuses[index % 4];
-  const paidAmount = paymentStatus === "Paid" ? orderAmount : 
-                     paymentStatus === "Partially Paid" ? Math.floor(orderAmount * 0.5) : 
-                     paymentStatus === "Waived" ? 0 : 0;
+  const paidAmount = paymentStatus === "Paid" ? orderAmount :
+    paymentStatus === "Partially Paid" ? Math.floor(orderAmount * 0.5) :
+      paymentStatus === "Waived" ? 0 : 0;
 
   return {
     orderId: `RX${String(100000 + index).slice(-6)}`,

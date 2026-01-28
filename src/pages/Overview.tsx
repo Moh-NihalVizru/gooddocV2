@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { format, addDays } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { AppSidebar } from "@/components/AppSidebar";
 import { AppHeader } from "@/components/AppHeader";
@@ -10,10 +11,10 @@ import { OverviewKpiCard } from "@/components/overview/OverviewKpiCard";
 import { postToWorkflow } from "@/services/apiService";
 import { toast } from "sonner";
 import { authService } from "@/services/authService";
-import { 
-  BedDouble, 
-  Stethoscope, 
-  CalendarClock, 
+import {
+  BedDouble,
+  Stethoscope,
+  CalendarClock,
   Scissors,
   AlertTriangle,
   Pill,
@@ -28,6 +29,7 @@ import iconOpPatients from "@/assets/icon-op-patients.svg";
 import iconIpPatients from "@/assets/icon-ip-patients.svg";
 import iconDiagnostics from "@/assets/icon-diagnostics.svg";
 import iconRevenue from "@/assets/icon-revenue.svg";
+import { DateRange } from "react-day-picker";
 
 interface SubMetric {
   label: string;
@@ -46,6 +48,7 @@ interface MetricCardProps {
   isPrimary?: boolean;
   subMetrics?: SubMetric[];
   badge?: string;
+  isLoading?: boolean;
 }
 
 const iconColors = {
@@ -58,59 +61,68 @@ const iconColors = {
   inventory: "text-foreground",
 };
 
-const StandardMetricCard = ({ 
-  title, 
+const StandardMetricCard = ({
+  title,
   count,
   displayCount,
-  icon: Icon, 
-  route, 
+  icon: Icon,
+  route,
   iconColorClass,
   badge,
+  isLoading,
 }: MetricCardProps) => {
   const navigate = useNavigate();
-  
+
   return (
     <button
-      onClick={() => navigate(route)}
-      aria-label={`Open ${title} list (${count})`}
-      className="
+      onClick={() => !isLoading && navigate(route)}
+      aria-label={isLoading ? `Loading ${title}` : `Open ${title} list (${count})`}
+      disabled={isLoading}
+      className={`
         group w-full text-left rounded-xl border border-border bg-card
         transition-all duration-200 ease-out
-        hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5
-        active:scale-[0.98]
+        ${isLoading ? "cursor-default opacity-80" : "hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98]"}
         focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
         h-[90px] px-4 flex items-center gap-3
-      "
+      `}
     >
-      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-white border border-border shadow-sm shrink-0">
+      <div className={`flex items-center justify-center w-10 h-10 rounded-lg bg-white border border-border shadow-sm shrink-0 ${isLoading ? "opacity-50 grayscale" : ""}`}>
         <Icon className={`w-5 h-5 ${iconColorClass}`} />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <p className="text-foreground" style={{ fontSize: "22px", fontWeight: 600, letterSpacing: "-1.5px" }}>
-            {displayCount ? (
-              displayCount.includes('|') ? (
-                <>
-                  {displayCount.split('|')[0].trim()}
-                  <span className="text-[14px] font-medium text-muted-foreground" style={{ fontWeight: 500, letterSpacing: "normal" }}>{displayCount.split('|').slice(1).join('|')}</span>
-                </>
-              ) : displayCount
-            ) : count.toLocaleString()}
-          </p>
-          {badge && (
-            <span className="px-2 py-0.5 rounded-full bg-red-500 text-white text-xs font-semibold shadow-sm">
-              {badge}
-            </span>
+          {isLoading ? (
+            <div className="h-6 w-12 bg-muted animate-pulse rounded-md" />
+          ) : (
+            <>
+              <p className="text-foreground" style={{ fontSize: "22px", fontWeight: 600, letterSpacing: "-1.5px" }}>
+                {displayCount ? (
+                  displayCount.includes('|') ? (
+                    <>
+                      {displayCount.split('|')[0].trim()}
+                      <span className="text-[14px] font-medium text-muted-foreground" style={{ fontWeight: 500, letterSpacing: "normal" }}>{displayCount.split('|').slice(1).join('|')}</span>
+                    </>
+                  ) : displayCount
+                ) : count.toLocaleString()}
+              </p>
+              {badge && (
+                <span className="px-2 py-0.5 rounded-full bg-red-500 text-white text-xs font-semibold shadow-sm">
+                  {badge}
+                </span>
+              )}
+            </>
           )}
         </div>
         <p className="text-xs font-medium text-muted-foreground truncate">
           {title}
         </p>
       </div>
-      <ChevronRight 
-        aria-hidden="true"
-        className="w-5 h-5 text-primary/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all duration-200 shrink-0" 
-      />
+      {!isLoading && (
+        <ChevronRight
+          aria-hidden="true"
+          className="w-5 h-5 text-primary/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all duration-200 shrink-0"
+        />
+      )}
     </button>
   );
 };
@@ -149,10 +161,12 @@ const Overview = () => {
   const [overviewData, setOverviewData] = useState<OverviewData>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedRange, setSelectedRange] = useState<DateRange | undefined>(undefined);
   const abortControllerRef = useRef<AbortController | null>(null);
   const isMountedRef = useRef(true);
 
-  const fetchOverviewData = async () => {
+  const fetchOverviewData = async (input?: { date?: Date; range?: DateRange | undefined }) => {
     // Get user email and ID from localStorage, or from auth service
     let userEmail = localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
     let userId = localStorage.getItem("userId") || sessionStorage.getItem("userId");
@@ -185,12 +199,32 @@ const Overview = () => {
     abortControllerRef.current = controller;
 
     try {
-      const payload = {
+      const rangeToUse = input?.range ?? selectedRange;
+      const dateToUse = input?.date ?? selectedDate;
+
+      const payload: Record<string, any> = {
         action: "getLandingPageData",
         email: userEmail,
         userId,
-        date: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
       };
+
+      // Always send startDate and endDate in date range model format
+      if (rangeToUse?.from && rangeToUse?.to) {
+        // If a full range is selected, use the selected range
+        const startDate = format(rangeToUse.from, "yyyy-MM-dd");
+        const endDate = format(rangeToUse.to, "yyyy-MM-dd");
+        payload.startDate = startDate;
+        payload.endDate = endDate;
+        // keep date for compatibility (use start of range)
+        payload.date = startDate;
+      } else {
+        // If a single date is selected or on initial load, set endDate to one day after startDate
+        const startDate = format(dateToUse ?? new Date(), "yyyy-MM-dd");
+        const endDate = format(addDays(dateToUse ?? new Date(), 1), "yyyy-MM-dd");
+        payload.startDate = startDate;
+        payload.endDate = endDate;
+        payload.date = startDate;
+      }
 
       const { data, error: apiError } = await postToWorkflow<any>(
         API_ENDPOINT,
@@ -211,10 +245,29 @@ const Overview = () => {
       // Process the response data
       // The API response structure may vary, adjust based on actual response
       const responseData = data[0];
-      
+
       // Map the response to our OverviewData interface
-      // Adjust field names based on actual API response structure
+      // Current API shape example:
+      // {
+      //   Outpatient: "1",
+      //   Inpatient: "1",
+      //   VisitCompleted: "0",
+      //   VisitPending: "1",
+      //   NewAdmission: "1",
+      //   Discharged: "0"
+      // }
       const mappedData: OverviewData = {
+        // OP/IP counts
+        opPatients: parseInt(responseData.Outpatient || responseData.outpatient || responseData.opPatients || responseData.op_patients || "0") || 0,
+        ipPatients: parseInt(responseData.Inpatient || responseData.inpatient || responseData.ipPatients || responseData.ip_patients || "0") || 0,
+        // Visit completion/pending
+        opPatientsCompleted: parseInt(responseData.VisitCompleted || responseData.visitCompleted || responseData.opPatientsCompleted || responseData.op_patients_completed || "0") || 0,
+        opPatientsPending: parseInt(responseData.VisitPending || responseData.visitPending || responseData.opPatientsPending || responseData.op_patients_pending || "0") || 0,
+        // Admissions/discharges
+        ipNewAdmissions: parseInt(responseData.NewAdmission || responseData.newAdmission || responseData.ipNewAdmissions || responseData.ip_new_admissions || "0") || 0,
+        ipDischarged: parseInt(responseData.Discharged || responseData.discharged || responseData.ipDischarged || responseData.ip_discharged || "0") || 0,
+
+        // The remaining fields default to zero/empty until the API provides them
         appointmentRequests: parseInt(responseData.appointmentRequests || responseData.appointment_requests || "0") || 0,
         doctorsOnDuty: parseInt(responseData.doctorsOnDuty || responseData.doctors_on_duty || "0") || 0,
         medicineOrders: parseInt(responseData.medicineOrders || responseData.medicine_orders || "0") || 0,
@@ -224,14 +277,6 @@ const Overview = () => {
         surgeries: parseInt(responseData.surgeries || "0") || 0,
         emergencyCases: parseInt(responseData.emergencyCases || responseData.emergency_cases || "0") || 0,
         lowStock: parseInt(responseData.lowStock || responseData.low_stock || "0") || 0,
-        opPatients: parseInt(responseData.opPatients || responseData.op_patients || "0") || 0,
-        opPatientsCompleted: parseInt(responseData.opPatientsCompleted || responseData.op_patients_completed || "0") || 0,
-        opPatientsPending: parseInt(responseData.opPatientsPending || responseData.op_patients_pending || "0") || 0,
-        ipPatients: parseInt(responseData.ipPatients || responseData.ip_patients || "0") || 0,
-        ipPatientsICU: parseInt(responseData.ipPatientsICU || responseData.ip_patients_icu || "0") || 0,
-        ipPatientsWard: parseInt(responseData.ipPatientsWard || responseData.ip_patients_ward || "0") || 0,
-        ipNewAdmissions: parseInt(responseData.ipNewAdmissions || responseData.ip_new_admissions || "0") || 0,
-        ipDischarged: parseInt(responseData.ipDischarged || responseData.ip_discharged || "0") || 0,
         diagnostics: parseInt(responseData.diagnostics || "0") || 0,
         diagnosticsLaboratory: parseInt(responseData.diagnosticsLaboratory || responseData.diagnostics_laboratory || "0") || 0,
         diagnosticsRadiology: parseInt(responseData.diagnosticsRadiology || responseData.diagnostics_radiology || "0") || 0,
@@ -277,6 +322,20 @@ const Overview = () => {
     };
   }, []);
 
+  // Handle date/range changes from the calendar widget
+  const handleDateChange = (date: Date) => {
+    setSelectedDate(date);
+    setSelectedRange(undefined);
+    fetchOverviewData({ date, range: undefined });
+  };
+
+  const handleRangeChange = (range: DateRange | undefined) => {
+    setSelectedRange(range);
+    if (range?.from && range?.to) {
+      fetchOverviewData({ range });
+    }
+  };
+
   // Top row cards (first 4) - populated from API data
   const topRowCards: MetricCardProps[] = [
     {
@@ -305,7 +364,7 @@ const Overview = () => {
     {
       title: "Beds Availability",
       count: overviewData.bedsAvailable || 0,
-      displayCount: overviewData.bedsAvailable 
+      displayCount: overviewData.bedsAvailable
         ? `${overviewData.bedsAvailable}| ICU: ${overviewData.bedsICU || 0} • Ward: ${overviewData.bedsWard || 0}`
         : "0",
       icon: BedDouble,
@@ -342,21 +401,28 @@ const Overview = () => {
   return (
     <div className="flex min-h-screen bg-background">
       <AppSidebar />
-      
+
       <PageContent>
         <AppHeader breadcrumbs={["Overview"]} />
-        
+
         <main className="p-6">
           {/* Header Card */}
           <Card className="p-5 mb-6">
             <div className="flex items-center justify-between">
               <h1 className="text-lg font-semibold text-foreground">Today's Summary</h1>
               <div className="flex items-center gap-4">
-                <CalendarWidget pageKey="overview" showSubtext={true} />
+                <CalendarWidget
+                  pageKey="overview"
+                  showSubtext={true}
+                  selectedDate={selectedDate}
+                  selectedRange={selectedRange}
+                  onDateChange={handleDateChange}
+                  onRangeChange={handleRangeChange}
+                />
                 {error && (
-                  <Button 
-                    onClick={fetchOverviewData} 
-                    variant="outline" 
+                  <Button
+                    onClick={() => fetchOverviewData()}
+                    variant="outline"
                     size="sm"
                     className="h-9"
                   >
@@ -376,15 +442,7 @@ const Overview = () => {
             </div>
           </Card>
 
-          {/* Loading State */}
-          {isLoading && (
-            <Card className="p-8 mb-6">
-              <div className="flex items-center justify-center gap-3">
-                <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                <p className="text-sm text-muted-foreground">Loading overview data...</p>
-              </div>
-            </Card>
-          )}
+
 
           {/* Error State */}
           {error && !isLoading && (
@@ -395,7 +453,7 @@ const Overview = () => {
                   <p className="text-sm font-medium text-destructive">Failed to load overview data</p>
                   <p className="text-xs text-muted-foreground mt-1">{error}</p>
                 </div>
-                <Button onClick={fetchOverviewData} variant="outline" size="sm">
+                <Button onClick={() => fetchOverviewData()} variant="outline" size="sm">
                   Retry
                 </Button>
               </div>
@@ -403,7 +461,7 @@ const Overview = () => {
           )}
 
           {/* Priority KPI Cards Row - New Design */}
-          {!isLoading && !error && (
+          {!error && (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
               <OverviewKpiCard
                 title="OP Patients"
@@ -411,16 +469,17 @@ const Overview = () => {
                 iconSrc={iconOpPatients}
                 route="/patients/op?date=today"
                 bullets={[{ text: "Patients" }]}
+                isLoading={isLoading}
                 chips={[
-                  { 
-                    label: "Visit Completed", 
-                    value: (overviewData.opPatientsCompleted || 0).toString(), 
-                    route: "/patients/op?date=today&visitStatus=Completed" 
+                  {
+                    label: "Visit Completed",
+                    value: (overviewData.opPatientsCompleted || 0).toString(),
+                    route: "/patients/op?date=today&visitStatus=Completed"
                   },
-                  { 
-                    label: "Check in Pending", 
-                    value: (overviewData.opPatientsPending || 0).toString(), 
-                    route: "/patients/op?date=today&visitStatus=In_Queue" 
+                  {
+                    label: "Check in Pending",
+                    value: (overviewData.opPatientsPending || 0).toString(),
+                    route: "/patients/op?date=today&visitStatus=In_Queue"
                   },
                 ]}
               />
@@ -429,20 +488,21 @@ const Overview = () => {
                 kpiValue={(overviewData.ipPatients || 0).toString()}
                 iconSrc={iconIpPatients}
                 route="/patients/ip?status=admitted"
+                isLoading={isLoading}
                 bullets={[
-                  { text: `ICU ${overviewData.ipPatientsICU || 0}` }, 
+                  { text: `ICU ${overviewData.ipPatientsICU || 0}` },
                   { text: `Ward ${overviewData.ipPatientsWard || 0}` }
                 ]}
                 chips={[
-                  { 
-                    label: "New Admission", 
-                    value: (overviewData.ipNewAdmissions || 0).toString(), 
-                    route: "/patients/ip?status=admitted&admittedToday=true" 
+                  {
+                    label: "New Admission",
+                    value: (overviewData.ipNewAdmissions || 0).toString(),
+                    route: "/patients/ip?status=admitted&admittedToday=true"
                   },
-                  { 
-                    label: "Discharged", 
-                    value: (overviewData.ipDischarged || 0).toString(), 
-                    route: "/patients/discharged?date=today" 
+                  {
+                    label: "Discharged",
+                    value: (overviewData.ipDischarged || 0).toString(),
+                    route: "/patients/discharged?date=today"
                   },
                 ]}
               />
@@ -451,17 +511,18 @@ const Overview = () => {
                 kpiValue={(overviewData.diagnostics || 0).toString()}
                 iconSrc={iconDiagnostics}
                 route="/diagnostics/orders"
+                isLoading={isLoading}
                 bullets={[{ text: "Orders" }]}
                 chips={[
-                  { 
-                    label: "Laboratory", 
-                    value: (overviewData.diagnosticsLaboratory || 0).toString(), 
-                    route: "/diagnostics/orders?type=Laboratory" 
+                  {
+                    label: "Laboratory",
+                    value: (overviewData.diagnosticsLaboratory || 0).toString(),
+                    route: "/diagnostics/orders?type=Laboratory"
                   },
-                  { 
-                    label: "Radiology", 
-                    value: (overviewData.diagnosticsRadiology || 0).toString(), 
-                    route: "/diagnostics/orders?type=Radiology" 
+                  {
+                    label: "Radiology",
+                    value: (overviewData.diagnosticsRadiology || 0).toString(),
+                    route: "/diagnostics/orders?type=Radiology"
                   },
                 ]}
               />
@@ -470,17 +531,18 @@ const Overview = () => {
                 kpiValue={overviewData.revenue || "0"}
                 iconSrc={iconRevenue}
                 route="/reports/revenue?type=paid"
+                isLoading={isLoading}
                 bullets={[{ text: `${overviewData.revenueBillsPaid || 0} Bills Paid` }]}
                 chips={[
-                  { 
-                    label: "Outstanding Bills", 
-                    value: overviewData.revenueOutstanding || "₹0/0", 
-                    route: "/reports/revenue?type=outstanding" 
+                  {
+                    label: "Outstanding Bills",
+                    value: overviewData.revenueOutstanding || "₹0/0",
+                    route: "/reports/revenue?type=outstanding"
                   },
-                  { 
-                    label: "Advance Amount", 
-                    value: overviewData.revenueAdvance || "₹0/0", 
-                    route: "/reports/advance-payments" 
+                  {
+                    label: "Advance Amount",
+                    value: overviewData.revenueAdvance || "₹0/0",
+                    route: "/reports/advance-payments"
                   },
                 ]}
               />
@@ -488,18 +550,18 @@ const Overview = () => {
           )}
 
           {/* Top Row - Appointment, Doctors, Medicine, Beds */}
-          {!isLoading && !error && (
+          {!error && (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                 {topRowCards.map((card) => (
-                  <StandardMetricCard key={card.title} {...card} />
+                  <StandardMetricCard key={card.title} {...card} isLoading={isLoading} />
                 ))}
               </div>
 
               {/* Bottom Row - Other cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {bottomRowCards.map((card) => (
-                  <StandardMetricCard key={card.title} {...card} />
+                  <StandardMetricCard key={card.title} {...card} isLoading={isLoading} />
                 ))}
               </div>
             </>
